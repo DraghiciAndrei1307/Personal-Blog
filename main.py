@@ -3,15 +3,16 @@ from flask import Flask, abort, render_template, redirect, url_for, flash
 from flask_bootstrap import Bootstrap
 from flask_ckeditor import CKEditor
 #from flask_gravatar import Gravatar
-from flask_login import UserMixin, login_user, LoginManager, current_user, logout_user
+from flask_login import UserMixin, login_user, LoginManager, current_user, logout_user, login_required
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship, DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import Integer, String, Text
 from functools import wraps
+
+#from sqlalchemy.testing.pickleable import User
 from werkzeug.security import generate_password_hash, check_password_hash
 # Import your forms from the forms.py
-from forms import CreatePostForm
-
+from forms import CreatePostForm, RegisterForm, LoginForm
 
 '''
 Make sure the required packages are installed: 
@@ -31,8 +32,10 @@ app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
 ckeditor = CKEditor(app)
 Bootstrap(app)
 
-# TODO: Configure Flask-Login
+# Configure Flask-Login
 
+login_manager = LoginManager()
+login_manager.init_app(app)
 
 # CREATE DATABASE
 class Base(DeclarativeBase):
@@ -54,27 +57,84 @@ class BlogPost(db.Model):
     img_url: Mapped[str] = mapped_column(String(250), nullable=False)
 
 
-# TODO: Create a User table for all your registered users. 
+# Create a User table for all your registered users.
+
+class User(UserMixin, db.Model): # UserMixin contains some special attributes and methods required for the log in
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    email: Mapped[str] = mapped_column(String(100), unique=True)
+    password: Mapped[str] = mapped_column(String(100))
+    name: Mapped[str] = mapped_column(String(1000))
+
+# Create user_loader callback
+
+@login_manager.user_loader
+def load_user(user_id):
+    return db.session.execute(db.select(User).where(User.id == user_id)).scalar()
 
 
 with app.app_context():
     db.create_all()
 
 
-# TODO: Use Werkzeug to hash the user's password when creating a new user.
-@app.route('/register')
+# Use Werkzeug to hash the user's password when creating a new user.
+@app.route('/register', methods=["GET", "POST"])
 def register():
-    return render_template("register.html")
+
+    form = RegisterForm()
+
+    if form.validate_on_submit():
+
+        salted_password = generate_password_hash(form.password.data, method='pbkdf2:sha256', salt_length=8)
+
+        # check if the email exists inside the database User table
+
+        user = db.session.execute(db.select(User).where(User.email == form.email.data)).scalar()
+
+        if user:
+            flash('This email address is already registered', 'danger')
+            return redirect(url_for('login'))
+
+        # if the email address is new, we simply add the new user
+
+        new_user = User(email = form.email.data, password = salted_password, name = form.name.data)
+
+        db.session.add(new_user)
+
+        db.session.commit()
+
+        return redirect(url_for("login"))
+
+    return render_template("register.html", form=form)
 
 
-# TODO: Retrieve a user from the database based on their email. 
-@app.route('/login')
+# Retrieve a user from the database based on their email.
+@app.route('/login', methods=["GET", "POST"])
 def login():
-    return render_template("login.html")
+
+    form = LoginForm()
+
+    if form.validate_on_submit():
+
+        selected_user = db.session.execute(db.select(User).where(User.email == form.email.data)).scalar()
+
+        if not selected_user:
+
+            flash('Email is incorrect.')
+
+            return redirect(url_for("login"))
+        elif not check_password_hash(selected_user.password, form.password.data):
+            flash('Invalid password.')
+        else:
+            login_user(selected_user)
+            return redirect(url_for("get_all_posts"))
+
+    return render_template("login.html", form = form)
 
 
 @app.route('/logout')
+@login_required
 def logout():
+    logout_user()
     return redirect(url_for('get_all_posts'))
 
 
@@ -82,7 +142,7 @@ def logout():
 def get_all_posts():
     result = db.session.execute(db.select(BlogPost))
     posts = result.scalars().all()
-    return render_template("index.html", all_posts=posts)
+    return render_template("index.html", all_posts=posts, logged_in = current_user.is_authenticated)
 
 
 # TODO: Allow logged-in users to comment on posts
