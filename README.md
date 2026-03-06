@@ -132,5 +132,61 @@ We have the following routes configured:
     - '/about' # GET
     - '/contact' # GET
 
+Because it will take a really long time and will be redundant to discuss all the routes above, we will have a look over 
+just `one` route, namely the `/register` route.
 
 
+```python
+# Use Werkzeug to hash the user's password when creating a new user.
+@app.route('/register', methods=["GET", "POST"])
+def register():
+
+    form = RegisterForm()
+
+    if form.validate_on_submit():
+
+        salted_password = generate_password_hash(form.password.data, method='pbkdf2:sha256', salt_length=8)
+
+        # check if the email exists inside the database User table
+
+        user = db.session.execute(db.select(User).where(User.email == form.email.data)).scalar()
+
+        if user:
+            flash('This email address is already registered', 'danger')
+            return redirect(url_for('login'))
+
+        # if the email address is new, we simply add the new user
+
+        new_user = User(email = form.email.data, password = salted_password, name = form.name.data)
+
+        db.session.add(new_user)
+
+        db.session.commit()
+
+        return redirect(url_for("login"))
+
+    return render_template("register.html", form=form)
+```
+
+To define this route, we used the `app.route` decorator, a function that we used to decorate the `register` function. 
+The `app.route` decorator has the following parameters: a string that sets the route and a list of the requests types 
+(`GET` and `POST`) accepted by this route. 
+
+The register function has 2 main functionalities, depending on the request received:
+    
+- render the `register.html` file when a GET request is detected
+    
+- if the form (presented in the code snippet below) is submitted, we salt and hash (using the 
+`generate_password_hash` function from the `werkzeug.security` package) the password and then we save it inside 
+the User table inside our database alongside the other data provided by the user. In the end, we redirect to the 
+'/login' route so that the new user can log in.  
+
+```html
+ <form action = "{{ url_for('register') }}" method="POST" novalidate>
+     {{ form.hidden_tag() }}
+     {{ form.email.label }} <br> {{ form.email(type="email", class="form-control", style="width: 100%;", maxlength=200) }} <br>
+     {{ form.password.label }} <br> {{ form.password(type="password", class="form-control", style="width: 100%;", maxlength=200) }} <br>
+     {{ form.name.label }} <br> {{ form.name(type="name", class="form-control", style="width: 100%;", maxlength=200) }} <br>
+     {{ form.submit }}
+ </form>
+```
