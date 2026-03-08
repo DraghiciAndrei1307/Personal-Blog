@@ -339,6 +339,7 @@ def add_new_career_entry():
         new_career_entry = Career(
             organization_name=form.organization_name.data,
             role=form.role.data,
+            img_url=form.img_url.data,
             start_date=form.start_date.data,
             end_date=form.end_date.data,
             activity=form.activity.data,
@@ -362,6 +363,7 @@ def edit_career_entry(career_entry_id):
     form = CareerEntryForm(
         organization_name=selected_career_entry.organization_name,
         role=selected_career_entry.role,
+        img_url=selected_career_entry.img_url,
         start_date=selected_career_entry.start_date,
         end_date=selected_career_entry.end_date,
         activity=selected_career_entry.activity,
@@ -370,6 +372,7 @@ def edit_career_entry(career_entry_id):
     if form.validate_on_submit():
         selected_career_entry.organization_name = form.organization_name.data
         selected_career_entry.role = form.role.data
+        img_url = form.img_url.data
         selected_career_entry.start_date = form.start_date.data
         selected_career_entry.end_date = form.end_date.data
         selected_career_entry.activity = form.activity.data
