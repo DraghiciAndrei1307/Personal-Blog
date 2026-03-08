@@ -320,7 +320,7 @@ def show_career_entry(career_entry_id):
     selected_career_entry = db.get_or_404(Career, career_entry_id)
 
     return render_template(
-        "career.html",
+        "career_entry.html",
         career_entry=selected_career_entry,
         logged_in = current_user.is_authenticated)
 
