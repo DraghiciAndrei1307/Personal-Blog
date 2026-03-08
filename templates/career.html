@@ -25,13 +25,12 @@
         <!-- Career Entry preview-->
         {% for career_entry in career_entries %}
         <div class="post-preview">
-          <a href="#">
+          <a href="{{ url_for('show_career_entry', career_entry_id = career_entry.id) }}">
             <h2 class="post-title">{{ career_entry.organization_name }}</h2>
             <h3 class="post-subtitle">{{ career_entry.role }}</h3>
           </a>
           <p class="post-meta">
-            Start: {{career_entry.start}}
-            Finish: {{career_entry.end}}
+            from {{career_entry.start}} until {{career_entry.end}}
             {% if current_user.get_id() == '1' %}
               <a href="#">✘</a>
             {% endif %}
