@@ -16,6 +16,74 @@ There are 2 ways of using this web application app:
 
 ### Host on a private VM on your local home network
 
+If I want to test one of my Flask web application, I usually do the following steps on a dedicated virtual machine:
+
+1) Clone the repo on the designated virtual machine and use `cd` to enter the cloned repo.
+2) Inside the cloned repo, create the virtual environment like this: 
+
+```commandline
+python3 -m venv .venv
+```
+
+3) Add any relevant virtual environment variable inside the .venv/bin/activate file. Add the following at the bottom of 
+the file:
+
+```vim
+export FLASK_KEY=<value>
+```
+
+This exports a virtual environment variable when you load the virtual environment. 
+
+4) Load the virtual environment
+
+```commandline
+source .venv/bin/activate
+```
+
+5) Install all the requirements into the virtual environment:
+
+```commandline
+pip install -r requirements.txt
+```
+
+6) Configure the firewall and ports
+
+- Check if the firewalld is active
+
+```commandline
+sudo systemctl status firewalld
+```
+
+- If firewalld is not active, start and make it auto-start when the server boots
+
+```commandline
+sudo systemctl start firewalld
+sudo systemctl enable firewalld
+```
+
+- Open the port TCP 5000
+
+```commandline
+sudo firewall-cmd --permanent --add-port=5000/tcp
+```
+
+- Reload the firewall configurations
+
+```commandline
+sudo firewall-cmd --reload
+```
+
+- Check the open ports (you should see the port you just opened before)
+```commandline
+sudo firewall-cmd --list-ports
+```
+
+Also, one this that I usually do is to set the host (inside the main.py script) where this app will run like this:
+
+```python
+
+```
+
 ### Host on a dedicated VPS
 
 ## Development steps
