@@ -78,13 +78,45 @@ sudo firewall-cmd --reload
 sudo firewall-cmd --list-ports
 ```
 
-Also, one this that I usually do is to set the host (inside the main.py script) where this app will run like this:
+Also, one this that I usually do is to set the `host='0.0.0.0'` (inside the main.py script):
 
 ```python
-
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', debug=False, port=5000)
 ```
 
+The `0.0.0.0` is the default route. This means that no particular address has been designated. 
+
+7) In the end, run the application like this:
+
+```python
+python3 main.py
+```
+
+Now, if you go into the browser and type the ip address of your VM: `192.168.1.x:5000` you should see your web app up and 
+running inside your local network. 
+
 ### Host on a dedicated VPS
+
+As mentioned in the `Description` section of this README.md, I deployed the app using the Render.com (link: 
+https://render.com/) VPS. After I created myself (using the GitHub account) a FREE account, I created a new 
+"Web Service" and a "Postgres" database. 
+
+There are a few things that you should pay attention before you deploy your web service and PostgreSQL database:
+
+- Before you deploy the web application, you should configure the start command like this: `gunicorn main:app` and 
+create the following 3 environment variables inside the `Environment Variables` section:
+  - FLASK_KEY == <your_flask_secret_key>
+  - Python == 3.11.9
+  - DB_URI == <the_connection_string_of_your_database>
+
+- Before you deploy the PostgreSQL database:
+  - Check the `Internal Database URL` and copy-paste it as the value of the DB_URI environment variable
+
+`Mention:` Before you configure all the above, you have to link the `Web Service` with your GitHub repo. I guess this is 
+the first step before you configure the Environment variables and other stuff.
+
+In the end, just press the `Manual Deploy` and you will see your web application up and running. 
 
 ## Development steps
 
