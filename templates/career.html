@@ -41,12 +41,12 @@
         <hr class="my-4" />
         {% endfor %}
 
-        <!-- New Post -->
+        <!-- New Career Entry -->
         {% if current_user.get_id() == '1' %}
           <div class="d-flex justify-content-end mb-4">
             <a
               class="btn btn-primary float-right"
-              href="{{ url_for('career') }}"
+              href="{{ url_for('add_new_career_entry') }}"
               >Add New Entry</a
             >
           </div>
