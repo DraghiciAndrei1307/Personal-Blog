@@ -378,9 +378,13 @@ def edit_career_entry(career_entry_id):
         selected_career_entry.activity = form.activity.data
         db.session.commit()
 
-        return redirect(url_for("career"))
+        return redirect(url_for("career_entry.html", career_entry_id=career_entry_id))
 
-    return render_template( )
+    return render_template(
+        "make-career-entry.html",
+        form=form,
+        logged_in = current_user.is_authenticated
+    )
 
 
 @app.route("/delete/<int:career_entry_id>")
