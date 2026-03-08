@@ -321,7 +321,7 @@ def show_career_entry(career_entry_id):
 
     return render_template(
         "career.html",
-        career=selected_career_entry,
+        career_entry=selected_career_entry,
         logged_in = current_user.is_authenticated)
 
 
