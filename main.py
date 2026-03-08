@@ -314,7 +314,7 @@ def career():
         logged_in=current_user.is_authenticated
     )
 
-@app.route("/career/<int: career_entry_id>")
+@app.route("/career/<int:career_entry_id>")
 def show_career_entry(career_entry_id):
 
     selected_career_entry = db.get_or_404(Career, career_entry_id)
