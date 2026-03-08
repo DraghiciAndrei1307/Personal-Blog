@@ -98,6 +98,30 @@ class Comment(db.Model):
     author_id: Mapped[int] = mapped_column(Integer, db.ForeignKey("user_table.id"))
     author = relationship("User", back_populates="comments")
 
+
+class Career(db.Model):
+
+    __tablename__ = "career_table"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    organization_name: Mapped[str] = mapped_column(String(250), nullable=False)
+    role: Mapped[str] = mapped_column(String(250), nullable=False)
+    start_date: Mapped[str] = mapped_column(String(250), nullable=False)
+    end_date: Mapped[str] = mapped_column(String(250), nullable=False)
+    activity: Mapped[str] = mapped_column(Text, nullable=False)
+
+class Studies(db.Model):
+
+    __tablename__ = "studies_table"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    organization_name: Mapped[str] = mapped_column(String(250), nullable=False)
+    domain: Mapped[str] = mapped_column(String(250), nullable=False)
+    start_date: Mapped[str] = mapped_column(String(250), nullable=False)
+    end_date: Mapped[str] = mapped_column(String(250), nullable=False)
+    grade: Mapped[str] = mapped_column(String(250), nullable=False)
+
+
 with app.app_context():
     db.create_all()
 
@@ -274,11 +298,75 @@ def delete_post(post_id):
     db.session.commit()
     return redirect(url_for('get_all_posts'))
 
+# The following routes are a special part of this application. They help the users showcase their background
 
 @app.route("/about")
 def about():
     return render_template("about.html", logged_in = current_user.is_authenticated)
 
+@app.route("/career")
+def career():
+    result = db.session.execute(db.select(Career))
+    career_entries = result.scalars().all()
+    return render_template(
+        "career.html",
+        career_entries=career_entries,
+        logged_in=current_user.is_authenticated
+    )
+
+@app.route("/new-career-entry", methods=["GET", "POST"])
+@admin_only
+@login_required
+def add_new_career_entry():
+
+    return render_template("make-career-entry.html", logged_in = current_user.is_authenticated)
+
+@app.route("/edit-career-entry/<int:career_entry_id>", methods=["GET", "POST"])
+@admin_only
+@login_required
+def edit_career_entry(career_entry_id):
+    pass
+
+@app.route("/delete/<int:career_entry_id>")
+@admin_only
+@login_required
+def delete_career_entry(career_entry_id):
+    career_entry_to_delete = db.get_or_404(Career, career_entry_id)
+    db.session.delete(career_entry_to_delete)
+    db.session.commit()
+    return redirect(url_for('career'))
+
+@app.route("/studies")
+def studies():
+    result = db.session.execute(db.select(Studies))
+    studies_entries = result.scalars().all()
+    return render_template(
+        "studies.html",
+        studies_entries=studies_entries,
+        logged_in=current_user.is_authenticated
+    )
+
+@app.route("/new-studies-entry", methods=["GET", "POST"])
+@admin_only
+@login_required
+def add_new_studies_entry():
+
+    return render_template("make-studies-entry.html", logged_in = current_user.is_authenticated)
+
+@app.route("/edit-studies-entry/<int:studies_entry_id>", methods=["GET", "POST"])
+@admin_only
+@login_required
+def edit_studies_entry(studies_entry_id):
+    pass
+
+@app.route("/delete/<int:studies_entry_id>")
+@admin_only
+@login_required
+def delete_studies_entry(studies_entry_id):
+    studies_entry_to_delete = db.get_or_404(Studies, studies_entry_id)
+    db.session.delete(studies_entry_to_delete)
+    db.session.commit()
+    return redirect(url_for('studies'))
 
 @app.route("/contact")
 def contact():

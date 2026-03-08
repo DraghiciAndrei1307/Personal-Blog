@@ -1,0 +1,45 @@
+{% block content %}
+{%include "header.html" %}
+
+<!-- Page Header -->
+<header
+  class="masthead"
+  style="background-image: url('../static/assets/img/edit-bg.jpg')"
+>
+  <div class="container position-relative px-4 px-lg-5">
+    <div class="row gx-4 gx-lg-5 justify-content-center">
+      <div class="col-md-10 col-lg-8 col-xl-7">
+        <div class="page-heading">
+          {% if is_edit: %}
+          <h1>Edit Career Entry</h1>
+          {% else: %}
+          <h1>New Career Entry</h1>
+          {% endif %}
+          <span class="subheading"
+            >Success is a ladder you cannot climb with your hands in your pockets.</span
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="mb-4">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-md-10 mx-auto">
+
+        <form action="{{ url_for('add_new_post') }}" method="POST">
+
+          {{ form.hidden_tag() }}
+
+
+        </form>
+
+        {{ ckeditor.load() }} {{ ckeditor.config(name='activity') }}
+
+      </div>
+    </div>
+  </div>
+</main>
+{% include "footer.html" %} {% endblock %}
