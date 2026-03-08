@@ -42,6 +42,7 @@ class CareerEntryForm(FlaskForm):
     start_date = StringField("Start Date", validators=[DataRequired()])
     end_date = StringField("End Date", validators=[DataRequired()])
     activity = CKEditorField("Activity", validators=[DataRequired()])
+    img_url = StringField("Organization Image URL", validators=[DataRequired(), URL()])
     submit = SubmitField("Submit")
 
 # StudiesEntryForm so users can add their studies
@@ -52,4 +53,5 @@ class StudiesEntryForm(FlaskForm):
     start_date = StringField("Start Date", validators=[DataRequired()])
     end_date = StringField("End Date", validators=[DataRequired()])
     grade = StringField("Grade", validators=[DataRequired()])
+    img_url = StringField("Organization Image URL", validators=[DataRequired(), URL()])
     submit = SubmitField("Submit")

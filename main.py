@@ -109,6 +109,7 @@ class Career(db.Model):
     start_date: Mapped[str] = mapped_column(String(250), nullable=False)
     end_date: Mapped[str] = mapped_column(String(250), nullable=False)
     activity: Mapped[str] = mapped_column(Text, nullable=False)
+    img_url: Mapped[str] = mapped_column(String(250), nullable=False)
 
 class Studies(db.Model):
 
@@ -120,6 +121,7 @@ class Studies(db.Model):
     start_date: Mapped[str] = mapped_column(String(250), nullable=False)
     end_date: Mapped[str] = mapped_column(String(250), nullable=False)
     grade: Mapped[str] = mapped_column(String(250), nullable=False)
+    img_url: Mapped[str] = mapped_column(String(250), nullable=False)
 
 
 with app.app_context():
