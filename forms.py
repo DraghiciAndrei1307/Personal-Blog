@@ -34,3 +34,22 @@ class CommentForm(FlaskForm):
     body = CKEditorField("Comment", validators=[DataRequired()])
     submit = SubmitField("Add Comment")
 
+# CareerEntryForm so users can add their studies
+
+class CareerEntryForm(FlaskForm):
+    organization_name = StringField("Organization Name", validators=[DataRequired()])
+    role = StringField("Domain Name", validators=[DataRequired()])
+    start_date = StringField("Start Date", validators=[DataRequired()])
+    end_date = StringField("End Date", validators=[DataRequired()])
+    activity = CKEditorField("Activity", validators=[DataRequired()])
+    submit = SubmitField("Submit")
+
+# StudiesEntryForm so users can add their studies
+
+class StudiesEntryForm(FlaskForm):
+    university = StringField("Organization Name", validators=[DataRequired()])
+    faculty = StringField("Domain Name", validators=[DataRequired()])
+    start_date = StringField("Start Date", validators=[DataRequired()])
+    end_date = StringField("End Date", validators=[DataRequired()])
+    grade = StringField("Grade", validators=[DataRequired()])
+    submit = SubmitField("Submit")

@@ -29,9 +29,17 @@
     <div class="row">
       <div class="col-lg-8 col-md-10 mx-auto">
 
-        <form action="#" method="POST">
+        <form action="{{ url_for('add_new_studies_entry') }}" method="POST">
 
           {{ form.hidden_tag() }}
+
+          {{ form.university.label }}<br>{{ form.university(type="text", class="form-control", style="width: 100%;", maxlength=200) }}<br>
+          {{ form.faculty.label }}<br>{{ form.faculty(type="text", class="form-control", style="width: 100%;", maxlength=200) }}<br>
+          {{ form.start_date.label }}<br>{{ form.start_date(type="text", class="form-control", style="width: 100%;", maxlength=200) }}<br>
+          {{ form.end_date.label }}<br>{{ form.end_date(type="text", class="form-control", style="width: 100%;", maxlength=200) }}<br>
+          {{ form.grade.label }}<br>{{ form.grade(type="text", class="form-control", style="width: 100%;", maxlength=200) }}<br>
+
+          {{ form.submit }}
 
         </form>
 

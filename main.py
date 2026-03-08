@@ -13,7 +13,7 @@ from http import HTTPStatus
 #from sqlalchemy.testing.pickleable import User
 from werkzeug.security import generate_password_hash, check_password_hash
 # Import your forms from the forms.py
-from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm
+from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm, CareerEntryForm, StudiesEntryForm
 
 from typing import List
 from sqlalchemy import ForeignKey
@@ -115,8 +115,8 @@ class Studies(db.Model):
     __tablename__ = "studies_table"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    organization_name: Mapped[str] = mapped_column(String(250), nullable=False)
-    domain: Mapped[str] = mapped_column(String(250), nullable=False)
+    university: Mapped[str] = mapped_column(String(250), nullable=False)
+    faculty: Mapped[str] = mapped_column(String(250), nullable=False)
     start_date: Mapped[str] = mapped_column(String(250), nullable=False)
     end_date: Mapped[str] = mapped_column(String(250), nullable=False)
     grade: Mapped[str] = mapped_column(String(250), nullable=False)
@@ -319,7 +319,12 @@ def career():
 @login_required
 def add_new_career_entry():
 
-    return render_template("make-career-entry.html", logged_in = current_user.is_authenticated)
+    form = CareerEntryForm()
+
+    if form.validate_on_submit():
+        pass
+
+    return render_template("make-career-entry.html", form=form, logged_in = current_user.is_authenticated)
 
 @app.route("/edit-career-entry/<int:career_entry_id>", methods=["GET", "POST"])
 @admin_only
@@ -351,7 +356,12 @@ def studies():
 @login_required
 def add_new_studies_entry():
 
-    return render_template("make-studies-entry.html", logged_in = current_user.is_authenticated)
+    form = StudiesEntryForm()
+
+    if form.validate_on_submit():
+        pass
+
+    return render_template("make-studies-entry.html", form=form, logged_in = current_user.is_authenticated)
 
 @app.route("/edit-studies-entry/<int:studies_entry_id>", methods=["GET", "POST"])
 @admin_only
