@@ -314,6 +314,17 @@ def career():
         logged_in=current_user.is_authenticated
     )
 
+@app.route("/career/<int: career_entry_id>")
+def show_career_entry(career_entry_id):
+
+    selected_career_entry = db.get_or_404(Career, career_entry_id)
+
+    return render_template(
+        "career.html",
+        career=selected_career_entry,
+        logged_in = current_user.is_authenticated)
+
+
 @app.route("/new-career-entry", methods=["GET", "POST"])
 @admin_only
 @login_required
@@ -322,7 +333,20 @@ def add_new_career_entry():
     form = CareerEntryForm()
 
     if form.validate_on_submit():
-        pass
+
+        new_career_entry = Career(
+            organization_name=form.organization_name.data,
+            role=form.role.data,
+            start_date=form.start_date.data,
+            end_date=form.end_date.data,
+            activity=form.activity.data,
+        )
+
+        db.session.add(new_career_entry)
+        db.session.commit()
+
+        return redirect(url_for("career"))
+
 
     return render_template("make-career-entry.html", form=form, logged_in = current_user.is_authenticated)
 
@@ -330,7 +354,29 @@ def add_new_career_entry():
 @admin_only
 @login_required
 def edit_career_entry(career_entry_id):
-    pass
+
+    selected_career_entry = db.get_or_404(Career, career_entry_id)
+
+    form = CareerEntryForm(
+        organization_name=selected_career_entry.organization_name,
+        role=selected_career_entry.role,
+        start_date=selected_career_entry.start_date,
+        end_date=selected_career_entry.end_date,
+        activity=selected_career_entry.activity,
+    )
+
+    if form.validate_on_submit():
+        selected_career_entry.organization_name = form.organization_name.data
+        selected_career_entry.role = form.role.data
+        selected_career_entry.start_date = form.start_date.data
+        selected_career_entry.end_date = form.end_date.data
+        selected_career_entry.activity = form.activity.data
+        db.session.commit()
+
+        return redirect(url_for("career"))
+
+    return render_template( )
+
 
 @app.route("/delete/<int:career_entry_id>")
 @admin_only
