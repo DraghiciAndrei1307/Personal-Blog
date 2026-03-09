@@ -421,25 +421,79 @@ def studies():
         logged_in=current_user.is_authenticated
     )
 
+@app.route("/studies/<int:studies_entry_id>")
+def show_studies_entry(studies_entry_id):
+
+    selected_studies_entry = db.get_or_404(Studies, studies_entry_id)
+
+    return render_template(
+        "studies_entry.html",
+        studies_entry=selected_studies_entry,
+        logged_in = current_user.is_authenticated)
+
 @app.route("/new-studies-entry", methods=["GET", "POST"])
 @admin_only
 @login_required
 def add_new_studies_entry():
-
     form = StudiesEntryForm()
 
     if form.validate_on_submit():
-        pass
 
-    return render_template("make-studies-entry.html", form=form, logged_in = current_user.is_authenticated)
+        new_studies_entry = Studies(
+            university = form.university.data,
+            faculty = form.faculty.data,
+            start_date = form.start_date.data,
+            end_date = form.end_date.data,
+            grade = form.grade.data,
+            img_url = form.img_url.data,
+        )
+
+        db.session.add(new_studies_entry)
+        db.session.commit()
+
+        return redirect(url_for("studies"))
+
+    return render_template(
+        "make-studies-entry.html",
+        form=form,
+        logged_in = current_user.is_authenticated
+    )
 
 @app.route("/edit-studies-entry/<int:studies_entry_id>", methods=["GET", "POST"])
 @admin_only
 @login_required
 def edit_studies_entry(studies_entry_id):
-    pass
+    selected_studies_entry = db.get_or_404(Studies, studies_entry_id)
 
-@app.route("/delete/<int:studies_entry_id>")
+    form = StudiesEntryForm(
+        university = selected_studies_entry.university,
+        faculty = selected_studies_entry.faculty,
+        start_date = selected_studies_entry.start_date,
+        end_date = selected_studies_entry.end_date,
+        grade = selected_studies_entry.grade,
+        img_url = selected_studies_entry.img_url,
+    )
+
+    if form.validate_on_submit():
+
+        selected_studies_entry.university = form.university.data
+        selected_studies_entry.faculty = form.faculty.data
+        selected_studies_entry.start_date = form.start_date.data
+        selected_studies_entry.end_date = form.end_date.data
+        selected_studies_entry.grade = form.grade.data
+        selected_studies_entry.img_url = form.img_url.data
+        db.session.commit()
+
+        return redirect(url_for("show_studies_entry"))
+
+    return render_template(
+        "make-studies-entry.html",
+        is_edit=True,
+        form=form,
+        logged_in = current_user.is_authenticated
+    )
+
+@app.route("/delete/studies/<int:studies_entry_id>")
 @admin_only
 @login_required
 def delete_studies_entry(studies_entry_id):
