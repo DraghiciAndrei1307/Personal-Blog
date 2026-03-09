@@ -489,6 +489,7 @@ def edit_studies_entry(studies_entry_id):
     return render_template(
         "make-studies-entry.html",
         is_edit=True,
+        studies_entry_id=studies_entry_id,
         form=form,
         logged_in = current_user.is_authenticated
     )
