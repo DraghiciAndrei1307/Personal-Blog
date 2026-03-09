@@ -484,7 +484,7 @@ def edit_studies_entry(studies_entry_id):
         selected_studies_entry.img_url = form.img_url.data
         db.session.commit()
 
-        return redirect(url_for("show_studies_entry"))
+        return redirect(url_for("show_studies_entry", studies_entry_id=studies_entry_id))
 
     return render_template(
         "make-studies-entry.html",
