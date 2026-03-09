@@ -359,7 +359,7 @@ def add_new_career_entry():
         return redirect(url_for("career"))
 
 
-    return render_template("make-career-entry.html", form=form, logged_in = current_user.is_authenticated)
+    return render_template("make-career-entry.html", is_edit=False, form=form, logged_in = current_user.is_authenticated)
 
 @app.route("/edit-career-entry/<int:career_entry_id>", methods=["GET", "POST"])
 @admin_only
