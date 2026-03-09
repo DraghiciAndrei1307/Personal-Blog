@@ -29,20 +29,41 @@
     <div class="row">
       <div class="col-lg-8 col-md-10 mx-auto">
 
-        <form action="{{ url_for('add_new_post') }}" method="POST">
+        {% if not is_edit %}
 
-          {{ form.hidden_tag() }}
+          <form action="{{ url_for('add_new_post') }}" method="POST">
 
-          {{ form.title.label }} <br> {{ form.title(type="text", class="form-control", style="width: 100%;", maxlength=200) }} <br>
-          {{ form.subtitle.label }} <br> {{ form.subtitle(type="text", class="form-control", style="width: 100%;", maxlength=200) }} <br>
-          {{ form.img_url.label }} <br> {{ form.img_url(type="text", class="form-control", style="width: 100%;", maxlength=200) }} <br>
-          {{ form.body.label }} <br> {{ form.body }} <br>
+            {{ form.hidden_tag() }}
 
-          {{ form.submit }}
+            {{ form.title.label }} <br> {{ form.title(type="text", class="form-control", style="width: 100%;", maxlength=200) }} <br>
+            {{ form.subtitle.label }} <br> {{ form.subtitle(type="text", class="form-control", style="width: 100%;", maxlength=200) }} <br>
+            {{ form.img_url.label }} <br> {{ form.img_url(type="text", class="form-control", style="width: 100%;", maxlength=200) }} <br>
+            {{ form.body.label }} <br> {{ form.body }} <br>
 
-        </form>
+            {{ form.submit }}
 
-        {{ ckeditor.load() }} {{ ckeditor.config(name='body') }}
+          </form>
+
+          {{ ckeditor.load() }} {{ ckeditor.config(name='body') }}
+
+        {% else %}
+
+          <form action="{{ url_for('edit_post', post_id=post_id) }}" method="POST">
+
+            {{ form.hidden_tag() }}
+
+            {{ form.title.label }} <br> {{ form.title(type="text", class="form-control", style="width: 100%;", maxlength=200) }} <br>
+            {{ form.subtitle.label }} <br> {{ form.subtitle(type="text", class="form-control", style="width: 100%;", maxlength=200) }} <br>
+            {{ form.img_url.label }} <br> {{ form.img_url(type="text", class="form-control", style="width: 100%;", maxlength=200) }} <br>
+            {{ form.body.label }} <br> {{ form.body }} <br>
+
+            {{ form.submit }}
+
+          </form>
+
+          {{ ckeditor.load() }} {{ ckeditor.config(name='body') }}
+
+        {% endif %}
 
       </div>
     </div>

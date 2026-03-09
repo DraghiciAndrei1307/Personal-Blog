@@ -273,6 +273,7 @@ def add_new_post():
 @login_required
 def edit_post(post_id):
     post = db.get_or_404(BlogPost, post_id)
+
     edit_form = CreatePostForm(
         title=post.title,
         subtitle=post.subtitle,
@@ -280,6 +281,7 @@ def edit_post(post_id):
         author=post.author,
         body=post.body
     )
+
     if edit_form.validate_on_submit():
         post.title = edit_form.title.data
         post.subtitle = edit_form.subtitle.data
@@ -288,8 +290,14 @@ def edit_post(post_id):
         post.body = edit_form.body.data
         db.session.commit()
         return redirect(url_for("show_post", post_id=post.id))
-    return render_template("make-post.html", form=edit_form, is_edit=True, logged_in = current_user.is_authenticated)
 
+    return render_template(
+        "make-post.html",
+        form=edit_form,
+        post_id=post_id,
+        is_edit=True,
+        logged_in = current_user.is_authenticated
+    )
 
 @app.route("/delete/<int:post_id>")
 @admin_only
@@ -382,6 +390,8 @@ def edit_career_entry(career_entry_id):
 
     return render_template(
         "make-career-entry.html",
+        id_edit=True,
+        career_entry_id=career_entry_id,
         form=form,
         logged_in = current_user.is_authenticated
     )

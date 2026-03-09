@@ -29,22 +29,45 @@
     <div class="row">
       <div class="col-lg-8 col-md-10 mx-auto">
 
-        <form action="{{ url_for('add_new_career_entry') }}" method="POST">
+        {% if not is_edit %}
 
-          {{ form.hidden_tag() }}
+          <form action="{{ url_for('add_new_career_entry') }}" method="POST">
 
-          {{ form.organization_name.label }}<br>{{ form.organization_name(type="text", class="form-control", style="width: 100%;", maxlength=200) }}<br>
-          {{ form.role.label }}<br>{{ form.role(type="text", class="form-control", style="width: 100%;", maxlength=200) }}<br>
-          {{ form.img_url.label }}<br>{{ form.img_url(type="text", class="form-control", style="width: 100%;", maxlength=200) }}<br>
-          {{ form.start_date.label }}<br>{{ form.start_date(type="text", class="form-control", style="width: 100%;", maxlength=200) }}<br>
-          {{ form.end_date.label }}<br>{{ form.end_date(type="text", class="form-control", style="width: 100%;", maxlength=200) }}<br>
-          {{ form.activity.label }}<br>{{ form.activity }}<br>
+            {{ form.hidden_tag() }}
 
-          {{ form.submit }}
+            {{ form.organization_name.label }}<br>{{ form.organization_name(type="text", class="form-control", style="width: 100%;", maxlength=200) }}<br>
+            {{ form.role.label }}<br>{{ form.role(type="text", class="form-control", style="width: 100%;", maxlength=200) }}<br>
+            {{ form.img_url.label }}<br>{{ form.img_url(type="text", class="form-control", style="width: 100%;", maxlength=200) }}<br>
+            {{ form.start_date.label }}<br>{{ form.start_date(type="text", class="form-control", style="width: 100%;", maxlength=200) }}<br>
+            {{ form.end_date.label }}<br>{{ form.end_date(type="text", class="form-control", style="width: 100%;", maxlength=200) }}<br>
+            {{ form.activity.label }}<br>{{ form.activity }}<br>
 
-        </form>
+            {{ form.submit }}
 
-        {{ ckeditor.load() }} {{ ckeditor.config(name='activity') }}
+          </form>
+
+          {{ ckeditor.load() }} {{ ckeditor.config(name='activity') }}
+
+        {% else %}
+
+          <form action="{{ url_for('edit_career_entry', career_entry_id = career_entry_id) }}" method="POST">
+
+            {{ form.hidden_tag() }}
+
+            {{ form.organization_name.label }}<br>{{ form.organization_name(type="text", class="form-control", style="width: 100%;", maxlength=200) }}<br>
+            {{ form.role.label }}<br>{{ form.role(type="text", class="form-control", style="width: 100%;", maxlength=200) }}<br>
+            {{ form.img_url.label }}<br>{{ form.img_url(type="text", class="form-control", style="width: 100%;", maxlength=200) }}<br>
+            {{ form.start_date.label }}<br>{{ form.start_date(type="text", class="form-control", style="width: 100%;", maxlength=200) }}<br>
+            {{ form.end_date.label }}<br>{{ form.end_date(type="text", class="form-control", style="width: 100%;", maxlength=200) }}<br>
+            {{ form.activity.label }}<br>{{ form.activity }}<br>
+
+            {{ form.submit }}
+
+          </form>
+
+          {{ ckeditor.load() }} {{ ckeditor.config(name='activity') }}
+
+        {% endif %}
 
       </div>
     </div>
