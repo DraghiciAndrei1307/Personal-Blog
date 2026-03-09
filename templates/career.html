@@ -32,7 +32,7 @@
           <p class="post-meta">
             from {{career_entry.start}} until {{career_entry.end}}
             {% if current_user.get_id() == '1' %}
-              <a href="#">✘</a>
+              <a href="{{ url_for('delete_career_entry', career_entry_id=career_entry.id) }}">✘</a>
             {% endif %}
           </p>
         </div>
