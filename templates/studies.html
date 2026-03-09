@@ -30,10 +30,10 @@
             <h3 class="post-subtitle">{{ studies_entry.domain }}</h3>
           </a>
           <p class="post-meta">
-            Start: {{career_entry.start}}
-            Finish: {{career_entry.end}}
+            Start: {{studies_entry.start}}
+            Finish: {{studies_entry.end}}
             {% if current_user.get_id() == '1' %}
-              <a href="#">✘</a>
+              <a href="{{ url_for('delete_studies_entry', studies_entry_id=studies_entry.id) }}">✘</a>
             {% endif %}
           </p>
         </div>
