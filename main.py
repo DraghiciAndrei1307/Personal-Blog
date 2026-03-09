@@ -372,13 +372,13 @@ def edit_career_entry(career_entry_id):
     if form.validate_on_submit():
         selected_career_entry.organization_name = form.organization_name.data
         selected_career_entry.role = form.role.data
-        img_url = form.img_url.data
+        selected_career_entry.img_url = form.img_url.data
         selected_career_entry.start_date = form.start_date.data
         selected_career_entry.end_date = form.end_date.data
         selected_career_entry.activity = form.activity.data
         db.session.commit()
 
-        return redirect(url_for("career_entry.html", career_entry_id=career_entry_id))
+        return redirect(url_for("show_career_entry", career_entry_id=career_entry_id))
 
     return render_template(
         "make-career-entry.html",
