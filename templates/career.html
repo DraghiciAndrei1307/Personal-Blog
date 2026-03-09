@@ -30,7 +30,7 @@
             <h3 class="post-subtitle">{{ career_entry.role }}</h3>
           </a>
           <p class="post-meta">
-            from {{career_entry.start}} until {{career_entry.end}}
+            from {{career_entry.start_date}} until {{career_entry.end_date}}
             {% if current_user.get_id() == '1' %}
               <a href="{{ url_for('delete_career_entry', career_entry_id=career_entry.id) }}">✘</a>
             {% endif %}

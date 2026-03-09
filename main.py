@@ -395,7 +395,7 @@ def edit_career_entry(career_entry_id):
 
     return render_template(
         "make-career-entry.html",
-        id_edit=True,
+        is_edit=True,
         career_entry_id=career_entry_id,
         form=form,
         logged_in = current_user.is_authenticated
