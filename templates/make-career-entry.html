@@ -29,9 +29,9 @@
     <div class="row">
       <div class="col-lg-8 col-md-10 mx-auto">
 
-        {% if not is_edit %}
+        {% if is_edit %}
 
-          <form action="{{ url_for('add_new_career_entry') }}" method="POST">
+            <form action="{{ url_for('edit_career_entry', career_entry_id = career_entry_id) }}" method="POST">
 
             {{ form.hidden_tag() }}
 
@@ -50,7 +50,7 @@
 
         {% else %}
 
-          <form action="{{ url_for('edit_career_entry', career_entry_id = career_entry_id) }}" method="POST">
+          <form action="{{ url_for('add_new_career_entry') }}" method="POST">
 
             {{ form.hidden_tag() }}
 
