@@ -299,7 +299,7 @@ def edit_post(post_id):
         logged_in = current_user.is_authenticated
     )
 
-@app.route("/delete/<int:post_id>")
+@app.route("/delete/post/<int:post_id>")
 @admin_only
 @login_required
 def delete_post(post_id):
@@ -402,7 +402,7 @@ def edit_career_entry(career_entry_id):
     )
 
 
-@app.route("/delete/<int:career_entry_id>")
+@app.route("/delete/career-entry/<int:career_entry_id>")
 @admin_only
 @login_required
 def delete_career_entry(career_entry_id):
