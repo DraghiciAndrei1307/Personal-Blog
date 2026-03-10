@@ -665,7 +665,7 @@ def edit_projects_entry(projects_entry_id):
         logged_in = current_user.is_authenticated
     )
 
-@app.route("/delete/steps/<int:step_id>")
+@app.route("/delete/steps/<int:step_id>", methods = ["POST"])
 @admin_only
 @login_required
 def delete_step(step_id):
@@ -681,7 +681,8 @@ def delete_step(step_id):
 
 
 
-@app.route("/delete/projects/<int:projects_entry_id>")
+@app.route("/delete/projects/<int:projects_entry_id>", methods = ["POST"])
+@admin_only
 @admin_only
 @login_required
 def delete_projects_entry(projects_entry_id):
