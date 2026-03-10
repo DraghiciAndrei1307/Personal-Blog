@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, PasswordField, FloatField
+from wtforms import StringField, SubmitField, PasswordField, FloatField, BooleanField
 from wtforms.validators import DataRequired, URL, Email
 from flask_ckeditor import CKEditorField
 
@@ -68,3 +68,5 @@ class ProjectsEntryForm(FlaskForm):
 class StepForm(FlaskForm):
     name = StringField("Step Name", validators=[DataRequired()])
     submit = SubmitField("Add Step")
+
+

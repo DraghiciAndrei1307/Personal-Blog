@@ -1,5 +1,5 @@
 from datetime import date
-from flask import Flask, abort, render_template, redirect, url_for, flash
+from flask import Flask, abort, render_template, redirect, url_for, flash, request
 from flask_bootstrap import Bootstrap
 from flask_ckeditor import CKEditor
 #from flask_gravatar import Gravatar
@@ -13,7 +13,8 @@ from http import HTTPStatus
 #from sqlalchemy.testing.pickleable import User
 from werkzeug.security import generate_password_hash, check_password_hash
 # Import your forms from the forms.py
-from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm, CareerEntryForm, StudiesEntryForm, ProjectsEntryForm, StepForm
+from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm, CareerEntryForm, StudiesEntryForm, \
+    ProjectsEntryForm, StepForm
 
 from typing import List
 from sqlalchemy import ForeignKey
@@ -562,6 +563,33 @@ def show_projects_entry(projects_entry_id):
         projects_entry=selected_projects_entry,
         logged_in = current_user.is_authenticated
     )
+
+@app.route("/update-progress/step/<int:step_id>", methods=["POST"])
+@admin_only
+@login_required
+def update_progress(step_id):
+
+    # Get the project entry by ID
+
+    selected_step = db.get_or_404(ProjectStep, step_id)
+
+    selected_step.completed = request.form.get("completed")
+
+    selected_projects_entry = db.get_or_404(Projects, selected_step.projects_entry_id)
+
+    # Update the progress_level value
+
+    completed_steps = 0
+
+    for step in selected_projects_entry.steps:
+
+        if step.completed:
+            completed_steps += 1
+
+    selected_step.progress = completed_steps / len(selected_projects_entry.steps)
+
+
+    return redirect(url_for("show_projects_entry", projects_entry_id=selected_step.projects_entry_id))
 
 @app.route("/new-projects-entry", methods=["GET", "POST"])
 @admin_only
