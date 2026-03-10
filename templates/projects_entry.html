@@ -49,18 +49,13 @@
               </label>
             {% endfor %}
 
-            <form>
+            <form method="POST" action="{{ {{ url_for('show_projects_entry', projects_entry_id = projects_entry.id) }} }}">
+
+              {{ form.hidden_tag() }}
+
                <label class="list-group-item d-flex gap-3 bg-body-tertiary">
-                  <input class="form-check-input form-check-input-placeholder bg-body-tertiary flex-shrink-0 pe-none" disabled="" type="checkbox" value="" style="font-size: 1.375em;">
-                  <span class="pt-1 form-checked-content"> <span contenteditable="true" class="w-100">New Task<br>
-                  </span>
-                    <small class="d-block text-body-secondary">
-                      <svg class="bi me-1" width="1em" height="1em" aria-hidden="true">
-                        <use xlink:href="#list-check"></use>
-                      </svg>
-                      Add Step
-                    </small>
-                  </span>
+                 {{ form.name(type="text", class="form-control", style="width: 100%;", maxlength=200) }}
+                 {{ form.submit }}
                </label>
             </form>
 
@@ -69,16 +64,7 @@
           </div>
         </div>
 
-
-
-        <ul class="list-group">
-          {% for step in steps %}
-            <li class="list-group-item">
-              <input class="form-check-input me-1" type="checkbox" value="" id="firstCheckboxStretched">
-              <label class="form-check-label stretched-link" for="firstCheckboxStretched">First checkbox</label>
-            </li>
-          {% endfor %}
-        </ul>
+        <h2 class="subheading">Description</h2>
 
         {{ projects_entry.body|safe }}
         {% if current_user.get_id() == '1' %}
