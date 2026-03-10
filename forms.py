@@ -58,7 +58,6 @@ class StudiesEntryForm(FlaskForm):
 
 class ProjectsEntryForm(FlaskForm):
     name = StringField("Project Name", validators=[DataRequired()])
-    progress_level = FloatField("Project Progress Level", validators=[DataRequired()])
     start_date = StringField("Start Date", validators=[DataRequired()])
     end_date = StringField("End Date", validators=[DataRequired()])
     body = CKEditorField("Description", validators=[DataRequired()])
