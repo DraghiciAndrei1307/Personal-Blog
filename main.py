@@ -125,7 +125,7 @@ class Studies(db.Model):
 
 class Projects(db.Model):
 
-    __tablename__ = "studies_table"
+    __tablename__ = "projects_table"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(250), nullable=False)
