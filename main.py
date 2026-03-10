@@ -681,8 +681,7 @@ def delete_step(step_id):
 
 
 
-@app.route("/delete/projects/<int:projects_entry_id>", methods = ["POST"])
-@admin_only
+@app.route("/delete/projects/<int:projects_entry_id>")
 @admin_only
 @login_required
 def delete_projects_entry(projects_entry_id):
