@@ -42,7 +42,7 @@
                          value=""
                          {% if step.completed %}checked{% endif %}
                          style="font-size: 1.375em;"
-                         onchange="this.form.submit()">
+                         onchange="this.form.submit()" {% if current_user.get_id() != '1' %} disabled {% endif %}>
                 </form>
                 <span class="pt-1 form-checked-content">
                   <strong>
