@@ -49,7 +49,7 @@
               </label>
             {% endfor %}
 
-            <form method="POST" action="{{ {{ url_for('show_projects_entry', projects_entry_id = projects_entry.id) }} }}">
+            <form method="POST" action="{{ url_for('show_projects_entry', projects_entry_id = projects_entry.id) }} ">
 
               {{ form.hidden_tag() }}
 
