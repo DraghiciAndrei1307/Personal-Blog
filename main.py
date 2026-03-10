@@ -564,22 +564,24 @@ def show_projects_entry(projects_entry_id):
         logged_in = current_user.is_authenticated
     )
 
-@app.route("/update-progress/step/<int:step_id>", methods=["POST"])
+@app.route("/update-progress/step/<int:step_id>", methods=["GET", "POST"])
 @admin_only
 @login_required
 def update_progress(step_id):
 
     # Get the project entry by ID
-
     selected_step = db.get_or_404(ProjectStep, step_id)
 
-    if request.form.get("completed") is not None:
-        selected_step.completed = True
-    else:
-        selected_step.completed = False
+    # Change the status only when POST request received
+    if request.method == "POST":
+        if request.form.get("completed") is not None:
+            selected_step.completed = True
+        else:
+            selected_step.completed = False
 
-    db.session.commit()
+        db.session.commit()
 
+    # We compute the progress (when GET and POST received)
     selected_projects_entry = db.get_or_404(Projects, selected_step.project_id)
 
     # Update the progress_level value
