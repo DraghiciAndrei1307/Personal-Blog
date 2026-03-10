@@ -55,3 +55,11 @@ class StudiesEntryForm(FlaskForm):
     grade = StringField("Grade", validators=[DataRequired()])
     img_url = StringField("Organization Image URL", validators=[DataRequired(), URL()])
     submit = SubmitField("Submit")
+
+class ProjectsEntryForm(FlaskForm):
+    name = StringField("Project Name", validators=[DataRequired()])
+    start_date = StringField("Start Date", validators=[DataRequired()])
+    end_date = StringField("End Date", validators=[DataRequired()])
+    body = CKEditorField("Description", validators=[DataRequired()])
+    img_url = StringField("Project Image URL", validators=[DataRequired(), URL()])
+    submit = SubmitField("Submit")
