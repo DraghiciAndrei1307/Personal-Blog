@@ -10,7 +10,7 @@
       <div class="col-md-10 col-lg-8 col-xl-7">
         <div class="page-heading">
           <h1>Projects</h1>
-          <span class="subheading">My academic journey.</span>
+          <span class="subheading">My projects.</span>
         </div>
       </div>
     </div>
@@ -26,8 +26,8 @@
         {% for projects_entry in projects_entries %}
         <div class="post-preview">
           <a href="{{ url_for('show_projects_entry', projects_entry_id = projects_entry.id) }}">
-            <h2 class="post-title">{{ projects_entry.university }}</h2>
-            <h3 class="post-subtitle">{{ projects_entry.faculty }}</h3>
+            <h2 class="post-title">{{ projects_entry.name }}</h2>
+            <h3 class="post-subtitle">{{ projects_entry.name }}</h3>
           </a>
           <p class="post-meta">
             Start: {{projects_entry.start_date}}
