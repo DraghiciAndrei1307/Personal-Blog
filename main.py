@@ -598,6 +598,8 @@ def update_progress(step_id):
     else:
         selected_projects_entry.progress_level = 0
 
+    selected_projects_entry.progress_level = round(selected_projects_entry.progress_level, 2)
+
     db.session.commit()
 
     return redirect(url_for("show_projects_entry", projects_entry_id=selected_step.project_id))
@@ -663,6 +665,22 @@ def edit_projects_entry(projects_entry_id):
         logged_in = current_user.is_authenticated
     )
 
+@app.route("/delete/steps/<int:step_id>")
+@admin_only
+@login_required
+def delete_step(step_id):
+
+    selected_step = db.get_or_404(ProjectStep, step_id)
+
+    project_id = selected_step.project_id
+
+    db.session.delete(selected_step)
+    db.session.commit()
+
+    redirect(url_for("show_projects_entry", projects_entry_id=project_id))
+
+
+
 @app.route("/delete/projects/<int:projects_entry_id>")
 @admin_only
 @login_required
@@ -671,6 +689,8 @@ def delete_projects_entry(projects_entry_id):
     db.session.delete(projects_entry_to_delete)
     db.session.commit()
     return redirect(url_for('projects'))
+
+
 
 #----------------------------------------------------------------------------------------------------------------------#
 
