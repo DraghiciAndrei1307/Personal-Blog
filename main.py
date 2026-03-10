@@ -686,6 +686,11 @@ def delete_step(step_id):
 @login_required
 def delete_projects_entry(projects_entry_id):
     projects_entry_to_delete = db.get_or_404(Projects, projects_entry_id)
+
+    for step in projects_entry_to_delete.steps:
+        db.session.delete(step)
+        db.session.commit()
+
     db.session.delete(projects_entry_to_delete)
     db.session.commit()
     return redirect(url_for('projects'))
