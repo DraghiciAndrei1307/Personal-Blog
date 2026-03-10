@@ -44,7 +44,7 @@
             {{ form.submit }}
 
           </form>
-
+          {{ ckeditor.load() }} {{ ckeditor.config(name='body') }}
         {% else %}
 
           <form action="{{ url_for('add_new_projects_entry') }}" method="POST">
@@ -60,7 +60,7 @@
             {{ form.submit }}
 
           </form>
-
+          {{ ckeditor.load() }} {{ ckeditor.config(name='body') }}
         {% endif %}
 
       </div>

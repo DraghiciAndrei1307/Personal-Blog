@@ -521,7 +521,7 @@ def projects():
         logged_in=current_user.is_authenticated
     )
 
-@app.route("/projects/<int:studies_entry_id>")
+@app.route("/projects/<int:projects_entry_id>")
 def show_projects_entry(projects_entry_id):
 
     selected_projects_entry = db.get_or_404(Projects, projects_entry_id)
