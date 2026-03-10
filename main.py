@@ -677,7 +677,7 @@ def delete_step(step_id):
     db.session.delete(selected_step)
     db.session.commit()
 
-    redirect(url_for("show_projects_entry", projects_entry_id=project_id))
+    return redirect(url_for("show_projects_entry", projects_entry_id=project_id))
 
 
 
