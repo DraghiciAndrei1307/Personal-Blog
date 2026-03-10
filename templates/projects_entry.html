@@ -27,6 +27,59 @@
   <div class="container px-4 px-lg-5">
     <div class="row gx-4 gx-lg-5 justify-content-center">
       <div class="col-md-10 col-lg-8 col-xl-7">
+
+        <h2 class="subheading">Steps to complete</h2>
+
+        <div class="d-flex flex-column flex-md-row p-4 gap-4 py-md-5 align-items-center justify-content-center">
+          <div class="list-group">
+
+            {% for step in steps %}
+              <label class="list-group-item d-flex gap-3">
+                <input class="form-check-input flex-shrink-0" type="checkbox" value="" checked="" style="font-size: 1.375em;">
+                <span class="pt-1 form-checked-content">
+                  <strong>Finish sales report</strong>
+                  <small class="d-block text-body-secondary">
+                    <svg class="bi me-1" width="1em" height="1em" role="img" aria-label="Schedule">
+                    <use xlink:href="#calendar-event"></use>
+                    </svg>
+                    1:00–2:00pm
+
+                  </small>
+                </span>
+              </label>
+            {% endfor %}
+
+            <form>
+               <label class="list-group-item d-flex gap-3 bg-body-tertiary">
+                  <input class="form-check-input form-check-input-placeholder bg-body-tertiary flex-shrink-0 pe-none" disabled="" type="checkbox" value="" style="font-size: 1.375em;">
+                  <span class="pt-1 form-checked-content"> <span contenteditable="true" class="w-100">New Task<br>
+                  </span>
+                    <small class="d-block text-body-secondary">
+                      <svg class="bi me-1" width="1em" height="1em" aria-hidden="true">
+                        <use xlink:href="#list-check"></use>
+                      </svg>
+                      Add Step
+                    </small>
+                  </span>
+               </label>
+            </form>
+
+
+
+          </div>
+        </div>
+
+
+
+        <ul class="list-group">
+          {% for step in steps %}
+            <li class="list-group-item">
+              <input class="form-check-input me-1" type="checkbox" value="" id="firstCheckboxStretched">
+              <label class="form-check-label stretched-link" for="firstCheckboxStretched">First checkbox</label>
+            </li>
+          {% endfor %}
+        </ul>
+
         {{ projects_entry.body|safe }}
         {% if current_user.get_id() == '1' %}
           <div class="d-flex justify-content-end mb-4">

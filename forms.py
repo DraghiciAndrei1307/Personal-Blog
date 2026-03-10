@@ -64,3 +64,7 @@ class ProjectsEntryForm(FlaskForm):
     body = CKEditorField("Description", validators=[DataRequired()])
     img_url = StringField("Project Image URL", validators=[DataRequired(), URL()])
     submit = SubmitField("Submit")
+
+class StepForm(FlaskForm):
+    name = StringField("Step Name", validators=[DataRequired()])
+    submit = SubmitField("Add Step")

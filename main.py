@@ -6,14 +6,14 @@ from flask_ckeditor import CKEditor
 from flask_login import UserMixin, login_user, LoginManager, current_user, logout_user, login_required
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship, DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import Integer, String, Text, Float
+from sqlalchemy import Integer, String, Text, Float, Boolean
 from functools import wraps
 
 from http import HTTPStatus
 #from sqlalchemy.testing.pickleable import User
 from werkzeug.security import generate_password_hash, check_password_hash
 # Import your forms from the forms.py
-from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm, CareerEntryForm, StudiesEntryForm, ProjectsEntryForm
+from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm, CareerEntryForm, StudiesEntryForm, ProjectsEntryForm, StepForm
 
 from typing import List
 from sqlalchemy import ForeignKey
@@ -134,6 +134,19 @@ class Projects(db.Model):
     end_date: Mapped[str] = mapped_column(String(250), nullable=False)
     body: Mapped[str] = mapped_column(Text, nullable=False)
     img_url: Mapped[str] = mapped_column(String(250), nullable=False)
+
+    steps = relationship("ProjectStep", back_populates="project")
+
+class ProjectStep(db.Model):
+
+    __tablename__ = "project_steps_table"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(250), nullable=False)
+    completed: Mapped[bool] = mapped_column(Boolean, nullable=False)
+
+    project_id: Mapped[int] = mapped_column(Integer, db.ForeignKey("projects_table.id"))
+    project = relationship("Projects", back_populates="steps")
 
 with app.app_context():
     db.create_all()
@@ -527,8 +540,15 @@ def show_projects_entry(projects_entry_id):
 
     selected_projects_entry = db.get_or_404(Projects, projects_entry_id)
 
+    form = StepForm()
+
+    if form.validate_on_submit():
+        pass
+
+
     return render_template(
         "projects_entry.html",
+        form=form,
         projects_entry=selected_projects_entry,
         logged_in = current_user.is_authenticated
     )
