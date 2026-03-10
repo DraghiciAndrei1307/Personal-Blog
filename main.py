@@ -6,7 +6,7 @@ from flask_ckeditor import CKEditor
 from flask_login import UserMixin, login_user, LoginManager, current_user, logout_user, login_required
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship, DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import Integer, String, Text
+from sqlalchemy import Integer, String, Text, Float
 from functools import wraps
 
 from http import HTTPStatus
@@ -129,6 +129,7 @@ class Projects(db.Model):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(250), nullable=False)
+    progress_level: Mapped[str] = mapped_column(Float, nullable=False)
     start_date: Mapped[str] = mapped_column(String(250), nullable=False)
     end_date: Mapped[str] = mapped_column(String(250), nullable=False)
     body: Mapped[str] = mapped_column(Text, nullable=False)
@@ -542,6 +543,7 @@ def add_new_projects_entry():
 
         new_projects_entry = Projects(
             name = form.name.data,
+            progress_level = form.progress_level.data,
             start_date = form.start_date.data,
             end_date = form.end_date.data,
             body = form.body.data,
@@ -567,6 +569,7 @@ def edit_projects_entry(projects_entry_id):
 
     form = ProjectsEntryForm(
         name = selected_projects_entry.name,
+        progress_level = selected_projects_entry.progress_level,
         start_date = selected_projects_entry.start_date,
         end_date = selected_projects_entry.end_date,
         body = selected_projects_entry.body,
@@ -576,6 +579,7 @@ def edit_projects_entry(projects_entry_id):
     if form.validate_on_submit():
 
         selected_projects_entry.name = form.name.data
+        selected_projects_entry.progress_level = form.progress_level.data
         selected_projects_entry.start_date = form.start_date.data
         selected_projects_entry.end_date = form.end_date.data
         selected_projects_entry.body = form.body.data

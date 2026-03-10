@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, PasswordField
+from wtforms import StringField, SubmitField, PasswordField, FloatField
 from wtforms.validators import DataRequired, URL, Email
 from flask_ckeditor import CKEditorField
 
@@ -58,6 +58,7 @@ class StudiesEntryForm(FlaskForm):
 
 class ProjectsEntryForm(FlaskForm):
     name = StringField("Project Name", validators=[DataRequired()])
+    progress_level = FloatField("Project Progress Level", validators=[DataRequired()])
     start_date = StringField("Start Date", validators=[DataRequired()])
     end_date = StringField("End Date", validators=[DataRequired()])
     body = CKEditorField("Description", validators=[DataRequired()])
