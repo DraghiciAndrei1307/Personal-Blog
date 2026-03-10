@@ -546,6 +546,7 @@ def show_projects_entry(projects_entry_id):
 
         new_step = ProjectStep(
             name = form.name.data,
+            completed = False
         )
 
         db.session.add(new_step)
