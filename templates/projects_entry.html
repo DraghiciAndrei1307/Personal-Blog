@@ -35,7 +35,7 @@
 
             {% for step in projects_entry.steps %}
               <label class="list-group-item d-flex gap-3">
-                <form action="{{ url_for('update_progress_entry', projects_entry_id=projects_entry.id) }}" method="POST">
+                <form action="{{ url_for('update_progress', step_id=step.id) }}" method="POST">
                   <input name="completed" class="form-check-input flex-shrink-0" type="checkbox" value="" checked="" style="font-size: 1.375em;" onchange="this.form.submit()">
                 </form>
                 <span class="pt-1 form-checked-content">
