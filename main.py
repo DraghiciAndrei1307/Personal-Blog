@@ -554,7 +554,7 @@ def show_projects_entry(projects_entry_id):
         db.session.add(new_step)
         db.session.commit()
 
-        return redirect(url_for('show_projects_entry', projects_entry_id=projects_entry_id))
+        return redirect(url_for('update_progress', step_id=new_step.id))
 
 
     return render_template(
@@ -610,7 +610,7 @@ def add_new_projects_entry():
 
         new_projects_entry = Projects(
             name = form.name.data,
-            progress_level = form.progress_level.data,
+            progress_level = 100,
             start_date = form.start_date.data,
             end_date = form.end_date.data,
             body = form.body.data,
@@ -636,7 +636,6 @@ def edit_projects_entry(projects_entry_id):
 
     form = ProjectsEntryForm(
         name = selected_projects_entry.name,
-        progress_level = selected_projects_entry.progress_level,
         start_date = selected_projects_entry.start_date,
         end_date = selected_projects_entry.end_date,
         body = selected_projects_entry.body,
@@ -646,7 +645,6 @@ def edit_projects_entry(projects_entry_id):
     if form.validate_on_submit():
 
         selected_projects_entry.name = form.name.data
-        selected_projects_entry.progress_level = form.progress_level.data
         selected_projects_entry.start_date = form.start_date.data
         selected_projects_entry.end_date = form.end_date.data
         selected_projects_entry.body = form.body.data
