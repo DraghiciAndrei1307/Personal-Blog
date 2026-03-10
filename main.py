@@ -535,7 +535,7 @@ def projects():
         logged_in=current_user.is_authenticated
     )
 
-@app.route("/projects/<int:projects_entry_id>")
+@app.route("/projects/<int:projects_entry_id>", methods=["GET", "POST"])
 def show_projects_entry(projects_entry_id):
 
     selected_projects_entry = db.get_or_404(Projects, projects_entry_id)
@@ -543,7 +543,15 @@ def show_projects_entry(projects_entry_id):
     form = StepForm()
 
     if form.validate_on_submit():
-        pass
+
+        new_step = Projects(
+            name = form.name.data,
+        )
+
+        db.session.add(new_step)
+        db.session.commit()
+
+        return redirect(url_for('show_projects_entry', projects_entry_id=projects_entry_id))
 
 
     return render_template(
