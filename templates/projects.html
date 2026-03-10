@@ -1,44 +1,59 @@
 {% include "header.html" %}
 
 <!-- Page Header-->
-<header class="masthead" style="background-image: url('{{ project.img_url }}')">
+<header
+  class="masthead"
+  style="background-image: url('../static/assets/img/about-bg.jpg')"
+>
   <div class="container position-relative px-4 px-lg-5">
     <div class="row gx-4 gx-lg-5 justify-content-center">
       <div class="col-md-10 col-lg-8 col-xl-7">
-        <div class="post-heading">
-          <h1>{{ project.title }}</h1>
-          <h2 class="subheading">{{ project.subtitle }}</h2>
-          <span class="meta"
-            >Posted by
-            <a href="#">{{ project.author.name }}</a>
-            on {{ project.date }}
-          </span>
+        <div class="page-heading">
+          <h1>projects</h1>
+          <span class="subheading">My academic journey.</span>
         </div>
       </div>
     </div>
   </div>
 </header>
-
-<!-- Project Content -->
-<article>
+<!-- Main Content-->
+<main class="mb-4">
   <div class="container px-4 px-lg-5">
     <div class="row gx-4 gx-lg-5 justify-content-center">
       <div class="col-md-10 col-lg-8 col-xl-7">
-        {{ project.body|safe }}
 
+        <!-- projects Entry preview-->
+        {% for projects_entry in projects_entries %}
+        <div class="post-preview">
+          <a href="{{ url_for('show_projects_entry', projects_entry_id = projects_entry.id) }}">
+            <h2 class="post-title">{{ projects_entry.university }}</h2>
+            <h3 class="post-subtitle">{{ projects_entry.faculty }}</h3>
+          </a>
+          <p class="post-meta">
+            Start: {{projects_entry.start_date}}
+            Finish: {{projects_entry.end_date}}
+            {% if current_user.get_id() == '1' %}
+              <a href="{{ url_for('delete_projects_entry', projects_entry_id=projects_entry.id) }}">✘</a>
+            {% endif %}
+          </p>
+        </div>
+        <!-- Divider-->
+        <hr class="my-4" />
+        {% endfor %}
+
+        <!-- New projects Entry -->
         {% if current_user.get_id() == '1' %}
           <div class="d-flex justify-content-end mb-4">
             <a
               class="btn btn-primary float-right"
-              href="{{url_for('edit_project', project_id=project.id)}}"
-              >Edit Project</a
+              href="{{ url_for('add_new_projects_entry') }}"
+              >Add New Entry</a
             >
           </div>
         {% endif %}
-
       </div>
     </div>
   </div>
-</article>
+</main>
 
 {% include "footer.html" %}
