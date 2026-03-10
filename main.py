@@ -554,7 +554,7 @@ def show_projects_entry(projects_entry_id):
         db.session.add(new_step)
         db.session.commit()
 
-        return redirect(url_for('update_progress', step_id=new_step.id))
+        return redirect(url_for('update_progress_and_update_step', step_id=new_step.id))
 
 
     return render_template(
@@ -564,10 +564,36 @@ def show_projects_entry(projects_entry_id):
         logged_in = current_user.is_authenticated
     )
 
+@app.route("/update-progress/project/<int:project_id>", methods=["GET", "POST"])
+@admin_only
+@login_required
+def update_progress(project_id):
+    selected_projects_entry = db.get_or_404(Projects, project_id)
+
+    # Update the progress_level value
+
+    total_steps = len(selected_projects_entry.steps)
+
+    if total_steps > 0:
+        completed_count = 0
+        for s in selected_projects_entry.steps:
+            if s.completed:
+                completed_count += 1
+
+        selected_projects_entry.progress_level = (completed_count / total_steps) * 100
+    else:
+        selected_projects_entry.progress_level = 0
+
+    selected_projects_entry.progress_level = round(selected_projects_entry.progress_level, 2)
+
+    db.session.commit()
+
+    return redirect(url_for("show_projects_entry", projects_entry_id=project_id))
+
 @app.route("/update-progress/step/<int:step_id>", methods=["GET", "POST"])
 @admin_only
 @login_required
-def update_progress(step_id):
+def update_progress_and_update_step(step_id):
 
     # Get the project entry by ID
     selected_step = db.get_or_404(ProjectStep, step_id)
@@ -677,7 +703,7 @@ def delete_step(step_id):
     db.session.delete(selected_step)
     db.session.commit()
 
-    return redirect(url_for("show_projects_entry", projects_entry_id=project_id))
+    return redirect(url_for("update_progress", project_id=project_id))
 
 
 
