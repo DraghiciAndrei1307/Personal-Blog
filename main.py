@@ -573,21 +573,30 @@ def update_progress(step_id):
 
     selected_step = db.get_or_404(ProjectStep, step_id)
 
-    selected_step.completed = request.form.get("completed")
+    if request.form.get("completed") is not None:
+        selected_step.completed = True
+    else:
+        selected_step.completed = False
+
+    db.session.commit()
 
     selected_projects_entry = db.get_or_404(Projects, selected_step.project_id)
 
     # Update the progress_level value
 
-    completed_steps = 0
+    total_steps = len(selected_projects_entry.steps)
 
-    for step in selected_projects_entry.steps:
+    if total_steps > 0:
+        completed_count = 0
+        for s in selected_projects_entry.steps:
+            if s.completed:
+                completed_count += 1
 
-        if step.completed:
-            completed_steps += 1
+        selected_projects_entry.progress_level = (completed_count / total_steps) * 100
+    else:
+        selected_projects_entry.progress_level = 0
 
-    selected_step.progress = completed_steps / len(selected_projects_entry.steps)
-
+    db.session.commit()
 
     return redirect(url_for("show_projects_entry", projects_entry_id=selected_step.project_id))
 
