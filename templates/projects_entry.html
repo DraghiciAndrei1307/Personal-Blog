@@ -48,7 +48,7 @@
                   <strong>
                     {{ step.name }}
                     {% if current_user.get_id() == '1' %}
-                      <a href="{{ url_for('delete_projects_entry', projects_entry_id=projects_entry.id) }}">✘</a>
+                      <a href="{{ url_for('delete_step', step_id=step.id) }}">✘</a>
                     {% endif %}
                   </strong>
                   <small class="d-block text-body-secondary">
