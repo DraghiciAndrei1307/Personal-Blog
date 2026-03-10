@@ -575,7 +575,7 @@ def update_progress(step_id):
 
     selected_step.completed = request.form.get("completed")
 
-    selected_projects_entry = db.get_or_404(Projects, selected_step.projects_entry_id)
+    selected_projects_entry = db.get_or_404(Projects, selected_step.project_id)
 
     # Update the progress_level value
 
@@ -589,7 +589,7 @@ def update_progress(step_id):
     selected_step.progress = completed_steps / len(selected_projects_entry.steps)
 
 
-    return redirect(url_for("show_projects_entry", projects_entry_id=selected_step.projects_entry_id))
+    return redirect(url_for("show_projects_entry", projects_entry_id=selected_step.project_id))
 
 @app.route("/new-projects-entry", methods=["GET", "POST"])
 @admin_only
