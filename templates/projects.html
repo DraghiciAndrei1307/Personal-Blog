@@ -29,11 +29,11 @@
             <h2 class="post-title">{{ projects_entry.name }}</h2>
             <h3 class="post-subtitle">{{ projects_entry.name }}</h3>
           </a>
+          <a href="#">-</a>
           <div class="progress" role="progressbar" aria-label="Example with label" aria-valuenow="{{ projects_entry.progress_level }}" aria-valuemin="0" aria-valuemax="100">
-            <a href="#">-</a>
             <div class="progress-bar" style="width: {{ projects_entry.progress_level }}%">{{ projects_entry.progress_level }}%</div>
-            <a href="#">+</a>
           </div>
+          <a href="#">+</a>
           <p class="post-meta">
             Start: {{projects_entry.start_date}}
             Finish: {{projects_entry.end_date}}
