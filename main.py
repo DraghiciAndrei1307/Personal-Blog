@@ -544,7 +544,7 @@ def show_projects_entry(projects_entry_id):
 
     if form.validate_on_submit():
 
-        new_step = Projects(
+        new_step = ProjectStep(
             name = form.name.data,
         )
 
