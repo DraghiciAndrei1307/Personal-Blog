@@ -750,7 +750,8 @@ def health():
 @app.route("/ready")
 def ready():
     try:
-        db.session.execute("SELECT 1")
+        with app.app_context(): # make sure we have the context
+            db.session.execute("SELECT 1")
         return "OK", 200
     except Exception as e:
         print(e)
