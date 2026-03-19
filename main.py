@@ -748,7 +748,8 @@ def ready():
     try:
         db.session.execute("SELECT 1")
         return "OK", 200
-    except Exception:
+    except Exception as e:
+        print(e)
         return "Not Ready", 500
 
 #----------------------------------------------------------------------------------------------------------------------#
