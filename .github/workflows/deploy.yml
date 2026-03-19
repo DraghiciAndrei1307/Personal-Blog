@@ -7,10 +7,20 @@ on:
       - test
 jobs:
   test:
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
     runs-on: ubuntu-latest
     environment: Personal-Blog-Environment
     env:
       FLASK_KEY: ${{ secrets.FLASK_KEY }}
+      DB_URI: postgresql+psycopg2://test:test@localhost:5432/test_db
     steps:
       - name: Get Code
         uses: actions/checkout@v6
