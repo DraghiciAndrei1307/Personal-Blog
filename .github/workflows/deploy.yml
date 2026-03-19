@@ -23,7 +23,7 @@ jobs:
           pip install -r requirements.txt
       - name: Run the app
         run: |
-          python3 main.py
+          nohup python3 main.py & sleep 5
       - name: Access website
         run: |
           curl http://127.0.0.1:5000/
