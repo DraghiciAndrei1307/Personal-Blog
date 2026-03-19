@@ -739,6 +739,18 @@ def about():
 def contact():
     return render_template("contact.html", logged_in = current_user.is_authenticated)
 
+@app.route("/health")
+def health():
+    return "OK", 200
+
+@app.route("/ready")
+def ready():
+    try:
+        db.session.execute("SELECT 1")
+        return "OK", 200
+    except Exception:
+        return "Not Ready", 500
+
 #----------------------------------------------------------------------------------------------------------------------#
 
 if __name__ == "__main__":
