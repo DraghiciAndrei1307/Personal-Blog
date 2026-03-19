@@ -31,6 +31,12 @@ jobs:
       - name: Install depencencies
         run: |
           pip install -r requirements.txt
+      - name: Wait for Postgres
+        run: |
+          until pg_isready -h localhost -p 5432 -U test; do
+            echo "Waiting for Postgres..."
+            sleep 1
+          done
       - name: Run the app
         run: |
           nohup python3 main.py & sleep 5
