@@ -1,12 +1,12 @@
 # Personal-Blog
 
-## Description
+## 📝 Description
 
 This is my personal blog web application solution. If you want to check it you can either clone this repo (please 
 follow the steps described in the `Hot to use` section) and try it yourself, or you can check the deployed version on: 
 https://andrei-draghici-personal-website.onrender.com/  
 
-## How to use
+## 🧭 How to use
 
 There are 2 ways of using this web application app: 
     
@@ -14,7 +14,7 @@ There are 2 ways of using this web application app:
     - use a dedicated VPS and deploy this application on the Internet (this is the option I currently use)
 
 
-### Host on a private VM on your local home network
+### 🚀 Host on a private VM on your local home network
 
 If I want to test one of my Flask web application, I usually do the following steps on a dedicated virtual machine:
 
@@ -96,7 +96,7 @@ python3 main.py
 Now, if you go into the browser and type the ip address of your VM: `192.168.1.x:5000` you should see your web app up and 
 running inside your local network. 
 
-### Host on a dedicated VPS
+### 🚀 Host on a dedicated VPS
 
 As mentioned in the `Description` section of this README.md, I deployed the app using the Render.com (link: 
 https://render.com/) VPS. After I created myself (using the GitHub account) a FREE account, I created a new 
@@ -118,7 +118,7 @@ the first step before you configure the Environment variables and other stuff.
 
 In the end, just press the `Manual Deploy` and you will see your web application up and running. 
 
-## Development steps
+## 🪜 Development steps
 
 1) Create the Flask application and integrate the CKEditor and Bootstrap within the Flask application
 
