@@ -41,7 +41,7 @@ jobs:
           done
       - name: Connect to PostgreSQL
         run: |
-          psql -h postgres -d test_db -U test -p 5432 -c "SELECT 1;"
+          psql -h postgres -h postgres -d test_db -U test -p 5432 -c "SELECT 1;"
       - name: Run the app
         run: |
           nohup python3 main.py & sleep 5
