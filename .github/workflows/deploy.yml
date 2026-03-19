@@ -1,0 +1,30 @@
+name: Deploy Workflow
+on:
+  push:
+    branches:
+      - main
+      - dev
+      - test
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    environment: Personal-Blog-Environment
+    env:
+      FLASK_KEY: ${{ secrets.FLASK_KEY }}
+    steps:
+      - name: Get Code
+        uses: actions/checkout@v6
+      - name: Create virtual environment
+        run: | 
+          python3 -m venv .venv
+          source .venv/bin/activate
+      - name: Install depencencies
+        run: |
+          pip install -r requirements.txt
+      - name: Run the app
+        run: |
+          nohup python3 main.py & sleep 5
+      - name: Access website
+        run: |
+          curl http://127.0.0.1:5000/
+          curl http://127.0.0.1:5000/
