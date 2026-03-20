@@ -1,3 +1,6 @@
+
+"""Models used in the project"""
+
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from sqlalchemy import Integer, String, Text, Float, Boolean
@@ -5,11 +8,15 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 
 class Base(DeclarativeBase):
-    pass
+
+    """Base Model"""
+
 
 db = SQLAlchemy(model_class=Base)
 
-class User(UserMixin, db.Model): # UserMixin contains some special attributes and methods required for the log in
+class User(UserMixin, db.Model): # UserMixin contains some special attributes
+                                 # and methods required for the log in
+    """User Model"""
     __tablename__ = "user_table"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -23,6 +30,9 @@ class User(UserMixin, db.Model): # UserMixin contains some special attributes an
 # BlogPost model to create a table for all blog posts created by the admin users
 
 class BlogPost(db.Model):
+
+    """Blog Post Model"""
+
     __tablename__ = "blog_posts_table"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -41,6 +51,8 @@ class BlogPost(db.Model):
 
 class Comment(db.Model):
 
+    """Comment Model"""
+
     __tablename__ = "comment_table"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -55,6 +67,8 @@ class Comment(db.Model):
 
 class Career(db.Model):
 
+    """Career Model"""
+
     __tablename__ = "career_table"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -67,6 +81,8 @@ class Career(db.Model):
 
 class Studies(db.Model):
 
+    """Studies Model"""
+
     __tablename__ = "studies_table"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -78,6 +94,8 @@ class Studies(db.Model):
     img_url: Mapped[str] = mapped_column(String(250), nullable=False)
 
 class Projects(db.Model):
+
+    """Projects Model"""
 
     __tablename__ = "projects_table"
 
@@ -92,6 +110,8 @@ class Projects(db.Model):
     steps = relationship("ProjectStep", back_populates="project")
 
 class ProjectStep(db.Model):
+
+    """Project Step Model"""
 
     __tablename__ = "project_steps_table"
 
