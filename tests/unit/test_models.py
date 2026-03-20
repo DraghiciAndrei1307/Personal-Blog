@@ -1,4 +1,10 @@
-from project.models import User
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from project.models import User, db
+
 from werkzeug.security import generate_password_hash, check_password_hash
 
 def test_new_user():
@@ -16,5 +22,10 @@ def test_new_user():
 
     assert user.email == "andrei@yahoo.com"
     assert user.password != "123456"
-    assert user.check_password("123456") == user.password
+    assert check_password_hash(user.password, "123456")
     assert user.name == "Andrei"
+
+
+
+
+

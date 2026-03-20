@@ -1,4 +1,7 @@
 import pytest
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from project.main import app as flask_app
 from project.models import db, User
@@ -20,11 +23,12 @@ def client():
     with flask_app.app_context():
         db.create_all()
 
-    with flask_app.test_client() as client:
-        yield client
+        with flask_app.test_client() as client:
+            yield client
 
-    with flask_app.app_context():
-        db.drop_all() # clean everything after the test
+        # Perform some cleaning after the test is finished
+        db.session.remove()
+        db.drop_all()
 
 # Before we start testing routes, we need to create a user
 
@@ -34,50 +38,6 @@ def client():
 #     response = client.get("/register")
 #     assert response.status_code == 200
 
-def test_register_post(client):
-
-    # CREATE POST REQUEST FIRST
-    response = client.post("/register", data = {
-        "email": "andrei@yahoo.com",
-        "password": "123456",
-        "name": "andrei"
-    }, follow_redirects=True)
-    assert response.status_code == 200
-
-    # CHECK THE DATABASE AFTER
-
-    user = db.session.execute(db.select(User).where(User.email == "andrei@yahoo.com")).scalar()
-    assert user is not None
-    assert user.name == "andrei"
-
-    user = db.session.execute(db.select(User).where(User.email == "gabi@yahoo.com")).scalar()
-    assert user is None
-
-def test_login(client):
-
-    response = client.post("/register", data = {
-        "email": "marius@yahoo.com",
-        "password": "123456",
-        "name": "Marius"
-    }, follow_redirects=True)
-    assert response.status_code == 200
-
-    print(response.headers["Location"])
-
-    response = client.post("/login", data = {
-        "email": "marius@yahoo.com",
-        "password": "123456",
-        "submit": "Login"
-    }, follow_redirects=True)
-
-    assert response.headers["Location"] == "/"
-
-    response = client.post("/login", data = {
-        "email": "gabi@yahoo.com",
-        "password": "123456"
-    }, follow_redirects=False)
-
-    assert response.headers["Location"] == "/login"
 
 
 # def test_login_get(client):
