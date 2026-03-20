@@ -33,6 +33,6 @@ jobs:
           pytest -v tests/functional
       - name: Run the app and perform health check
         run: |
-          nohup python3 main.py & sleep 5
+          nohup python3 -m project.main & sleep 5
           curl -f http://127.0.0.1:5000/
           
