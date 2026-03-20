@@ -14,6 +14,7 @@ from project.models import db, User
 # unauthorized user
 
 
+
 @pytest.fixture
 def client():
     flask_app.config["TESTING"] = True
