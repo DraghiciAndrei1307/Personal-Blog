@@ -1,38 +1,28 @@
-from datetime import date
-from flask import Flask, abort, render_template, redirect, url_for, flash, request
-from flask_bootstrap import Bootstrap
-from flask_ckeditor import CKEditor
-#from flask_gravatar import Gravatar
-from flask_login import login_user, LoginManager, current_user, logout_user, login_required
 
-from project.models import User, BlogPost, Comment, Projects, ProjectStep, db, Career, Studies
-
-from functools import wraps
-
-from http import HTTPStatus
-#from sqlalchemy.testing.pickleable import User
-from werkzeug.security import generate_password_hash, check_password_hash
-# Import your forms from the forms.py
-from project.forms import CreatePostForm, RegisterForm, LoginForm, CommentForm, CareerEntryForm, StudiesEntryForm, \
-    ProjectsEntryForm, StepForm
-
-from typing import List
-from sqlalchemy import ForeignKey
+"""Main module."""
 
 import os
+from functools import wraps
+from http import HTTPStatus
 
-'''
-Make sure the required packages are installed: 
-Open the Terminal in PyCharm (bottom left). 
+from datetime import date
 
-On Windows type:
-python -m pip install -r requirements.txt
+from flask import (Flask, abort, render_template,
+                   redirect, url_for, flash, request)
+from flask_bootstrap import Bootstrap
+from flask_ckeditor import CKEditor
+from flask_login import (login_user, LoginManager, current_user,
+                         logout_user, login_required)
+from werkzeug.security import (generate_password_hash,
+                               check_password_hash)
 
-On MacOS type:
-pip3 install -r requirements.txt
+from project.models import (User, BlogPost, Comment, Projects,
+                            ProjectStep, db, Career, Studies)
 
-This will install the packages from the requirements.txt for this project.
-'''
+# Import your forms from the forms.py
+from project.forms import CreatePostForm, RegisterForm, LoginForm, \
+                          CommentForm, CareerEntryForm, StudiesEntryForm, \
+                          ProjectsEntryForm, StepForm
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('FLASK_KEY')
@@ -44,41 +34,65 @@ Bootstrap(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
+
 # CREATE DATABASE
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DB_URI", "sqlite:///posts.db")
+
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
+    "DB_URI",
+    "sqlite:///posts.db"
+)
+
 db.init_app(app)
 
 with app.app_context():
     db.create_all()
 
-# Create user_loader callback
 
 @login_manager.user_loader
 def load_user(user_id):
-    return db.session.execute(db.select(User).where(User.id == user_id)).scalar()
 
-# Use Werkzeug to hash the user's password when creating a new user.
+    """Special function(callback) that retrieves a user by id."""
+
+    return db.session.execute(
+        db.select(User).where(User.id == user_id)
+    ).scalar()
+
+
 @app.route('/register', methods=["GET", "POST"])
 def register():
+
+    """Register a new user."""
 
     form = RegisterForm()
 
     if form.validate_on_submit():
 
-        salted_password = generate_password_hash(form.password.data, method='pbkdf2:sha256', salt_length=8)
+        salted_password = generate_password_hash(
+            form.password.data,
+            method='pbkdf2:sha256',
+            salt_length=8
+        )
 
         # check if the email exists inside the database User table
 
-        user = db.session.execute(db.select(User).where(User.email == form.email.data)).scalar()
+        user = db.session.execute(
+            db.select(User).where(User.email == form.email.data)
+        ).scalar()
 
         if user:
-            flash('This email address is already registered', 'danger')
+            flash(
+                'This email address is already registered',
+                'danger')
             return redirect(url_for('login'))
 
         # if the email address is new, we simply add the new user
 
-        new_user = User(email = form.email.data, password = salted_password, name = form.name.data)
+        new_user = User(
+            email=form.email.data,
+            password=salted_password,
+            name=form.name.data
+        )
 
         db.session.add(new_user)
 
@@ -88,47 +102,66 @@ def register():
 
     return render_template("register.html", form=form)
 
-# Retrieve a user from the database based on their email.
+
 @app.route('/login', methods=["GET", "POST"])
 def login():
+
+    """Login a user."""
 
     form = LoginForm()
 
     if form.validate_on_submit():
 
-        selected_user = db.session.execute(db.select(User).where(User.email == form.email.data)).scalar()
+        selected_user = db.session.execute(
+            db.select(User).where(User.email == form.email.data)
+        ).scalar()
 
         if not selected_user:
             flash('Email is incorrect.')
             return redirect(url_for("login"))
 
-        elif not check_password_hash(selected_user.password, form.password.data):
+        if not check_password_hash(selected_user.password, form.password.data):
             flash('Invalid password.')
             return redirect(url_for("login"))
 
-        else:
-            login_user(selected_user)
-            return redirect(url_for("get_all_posts"))
+        login_user(selected_user)
+        return redirect(url_for("get_all_posts"))
 
-    return render_template("login.html", form = form)
+    return render_template(
+        "login.html",
+        form=form
+    )
+
 
 @app.route('/logout')
 @login_required
 def logout():
+
+    """Logout a user."""
+
     logout_user()
     return redirect(url_for('get_all_posts'))
 
-#--------------------------------BLOG POSTS----------------------------------------------------------------------------#
+# --------------------BLOG POSTS----------------------- #
+
 
 @app.route('/')
 def get_all_posts():
+
+    """Get all posts."""
+
     result = db.session.execute(db.select(BlogPost))
     posts = result.scalars().all()
-    return render_template("index.html", all_posts=posts, logged_in = current_user.is_authenticated)
+    return render_template(
+        "index.html",
+        all_posts=posts,
+        logged_in=current_user.is_authenticated
+    )
 
-# Allow logged-in users to comment on posts
+
 @app.route("/post/<int:post_id>", methods=["GET", "POST"])
 def show_post(post_id):
+    """Show a post."""
     requested_post = db.get_or_404(BlogPost, post_id)
 
     result = db.session.execute(db.select(Comment))
@@ -141,25 +174,32 @@ def show_post(post_id):
         # Add the new entry
 
         new_comment = Comment(
-            text = form.body.data,
-            post = requested_post,
+            text=form.body.data,
+            post=requested_post,
             author=current_user,
         )
 
         db.session.add(new_comment)
         db.session.commit()
 
-        return redirect(url_for("show_post", post_id=post_id, comments=comments, logged_in = current_user.is_authenticated))
+        return redirect(url_for(
+            "show_post",
+            post_id=post_id,
+            comments=comments,
+            logged_in=current_user.is_authenticated
+        ))
 
     return render_template(
         "post.html",
         post=requested_post,
-        logged_in = current_user.is_authenticated,
-        form = form,
-        comments = comments
+        logged_in=current_user.is_authenticated,
+        form=form,
+        comments=comments
     )
 
+
 def admin_only(f):
+    """Decorator for admin only functions."""
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if current_user.get_id() != '1':
@@ -169,10 +209,12 @@ def admin_only(f):
 
     return decorated_function
 
+
 @app.route("/new-post", methods=["GET", "POST"])
 @admin_only
 @login_required
 def add_new_post():
+    '''Add a new post.'''
     form = CreatePostForm()
     if form.validate_on_submit():
         new_post = BlogPost(
@@ -186,12 +228,18 @@ def add_new_post():
         db.session.add(new_post)
         db.session.commit()
         return redirect(url_for("get_all_posts"))
-    return render_template("make-post.html", form=form, logged_in = current_user.is_authenticated)
+    return render_template(
+        "make-post.html",
+        form=form,
+        logged_in=current_user.is_authenticated
+    )
+
 
 @app.route("/edit-post/<int:post_id>", methods=["GET", "POST"])
 @admin_only
 @login_required
 def edit_post(post_id):
+    '''Edit a post.'''
     post = db.get_or_404(BlogPost, post_id)
 
     edit_form = CreatePostForm(
@@ -216,24 +264,28 @@ def edit_post(post_id):
         form=edit_form,
         post_id=post_id,
         is_edit=True,
-        logged_in = current_user.is_authenticated
+        logged_in=current_user.is_authenticated
     )
+
 
 @app.route("/delete/post/<int:post_id>")
 @admin_only
 @login_required
 def delete_post(post_id):
+    '''Delete a post.'''
     post_to_delete = db.get_or_404(BlogPost, post_id)
     db.session.delete(post_to_delete)
     db.session.commit()
     return redirect(url_for('get_all_posts'))
 
-#----------------------------------------------------------------------------------------------------------------------#
+# -------------------------------------- #
 
-#--------------------------------CAREER--------------------------------------------------------------------------------#
+# ----------------CAREER-----------------#
+
 
 @app.route("/career")
 def career():
+    '''Get career entries.'''
     result = db.session.execute(db.select(Career))
     career_entries = result.scalars().all()
     return render_template(
@@ -242,21 +294,23 @@ def career():
         logged_in=current_user.is_authenticated
     )
 
+
 @app.route("/career/<int:career_entry_id>")
 def show_career_entry(career_entry_id):
-
+    '''Show a career entry.'''
     selected_career_entry = db.get_or_404(Career, career_entry_id)
 
     return render_template(
         "career_entry.html",
         career_entry=selected_career_entry,
-        logged_in = current_user.is_authenticated)
+        logged_in=current_user.is_authenticated)
+
 
 @app.route("/new-career-entry", methods=["GET", "POST"])
 @admin_only
 @login_required
 def add_new_career_entry():
-
+    '''Add a new career entry.'''
     form = CareerEntryForm()
 
     if form.validate_on_submit():
@@ -275,19 +329,19 @@ def add_new_career_entry():
 
         return redirect(url_for("career"))
 
-
     return render_template(
         "make-career-entry.html",
         is_edit=False,
         form=form,
-        logged_in = current_user.is_authenticated
+        logged_in=current_user.is_authenticated
     )
+
 
 @app.route("/edit-career-entry/<int:career_entry_id>", methods=["GET", "POST"])
 @admin_only
 @login_required
 def edit_career_entry(career_entry_id):
-
+    '''Edit a career entry.'''
     selected_career_entry = db.get_or_404(Career, career_entry_id)
 
     form = CareerEntryForm(
@@ -308,31 +362,38 @@ def edit_career_entry(career_entry_id):
         selected_career_entry.activity = form.activity.data
         db.session.commit()
 
-        return redirect(url_for("show_career_entry", career_entry_id=career_entry_id))
+        return redirect(url_for(
+            "show_career_entry",
+            career_entry_id=career_entry_id
+        ))
 
     return render_template(
         "make-career-entry.html",
         is_edit=True,
         career_entry_id=career_entry_id,
         form=form,
-        logged_in = current_user.is_authenticated
+        logged_in=current_user.is_authenticated
     )
+
 
 @app.route("/delete/career-entry/<int:career_entry_id>")
 @admin_only
 @login_required
 def delete_career_entry(career_entry_id):
+    '''Delete a career entry.'''
     career_entry_to_delete = db.get_or_404(Career, career_entry_id)
     db.session.delete(career_entry_to_delete)
     db.session.commit()
     return redirect(url_for('career'))
 
-#----------------------------------------------------------------------------------------------------------------------#
+# ------------------------------------------ #
 
-#--------------------------------STUDIES-------------------------------------------------------------------------------#
+# -----------------STUDIES------------------ #
+
 
 @app.route("/studies")
 def studies():
+    '''Show a list of studies entries.'''
     result = db.session.execute(db.select(Studies))
     studies_entries = result.scalars().all()
     return render_template(
@@ -341,31 +402,34 @@ def studies():
         logged_in=current_user.is_authenticated
     )
 
+
 @app.route("/studies/<int:studies_entry_id>")
 def show_studies_entry(studies_entry_id):
-
+    '''Get a studies entry by its ID.'''
     selected_studies_entry = db.get_or_404(Studies, studies_entry_id)
 
     return render_template(
         "studies_entry.html",
         studies_entry=selected_studies_entry,
-        logged_in = current_user.is_authenticated)
+        logged_in=current_user.is_authenticated)
+
 
 @app.route("/new-studies-entry", methods=["GET", "POST"])
 @admin_only
 @login_required
 def add_new_studies_entry():
+    '''Add a new studies entry.'''
     form = StudiesEntryForm()
 
     if form.validate_on_submit():
 
         new_studies_entry = Studies(
-            university = form.university.data,
-            faculty = form.faculty.data,
-            start_date = form.start_date.data,
-            end_date = form.end_date.data,
-            grade = form.grade.data,
-            img_url = form.img_url.data,
+            university=form.university.data,
+            faculty=form.faculty.data,
+            start_date=form.start_date.data,
+            end_date=form.end_date.data,
+            grade=form.grade.data,
+            img_url=form.img_url.data,
         )
 
         db.session.add(new_studies_entry)
@@ -376,22 +440,27 @@ def add_new_studies_entry():
     return render_template(
         "make-studies-entry.html",
         form=form,
-        logged_in = current_user.is_authenticated
+        logged_in=current_user.is_authenticated
     )
 
-@app.route("/edit-studies-entry/<int:studies_entry_id>", methods=["GET", "POST"])
+
+@app.route(
+    "/edit-studies-entry/<int:studies_entry_id>",
+    methods=["GET", "POST"]
+)
 @admin_only
 @login_required
 def edit_studies_entry(studies_entry_id):
+    '''Edit a studies entry by its ID.'''
     selected_studies_entry = db.get_or_404(Studies, studies_entry_id)
 
     form = StudiesEntryForm(
-        university = selected_studies_entry.university,
-        faculty = selected_studies_entry.faculty,
-        start_date = selected_studies_entry.start_date,
-        end_date = selected_studies_entry.end_date,
-        grade = selected_studies_entry.grade,
-        img_url = selected_studies_entry.img_url,
+        university=selected_studies_entry.university,
+        faculty=selected_studies_entry.faculty,
+        start_date=selected_studies_entry.start_date,
+        end_date=selected_studies_entry.end_date,
+        grade=selected_studies_entry.grade,
+        img_url=selected_studies_entry.img_url,
     )
 
     if form.validate_on_submit():
@@ -404,31 +473,38 @@ def edit_studies_entry(studies_entry_id):
         selected_studies_entry.img_url = form.img_url.data
         db.session.commit()
 
-        return redirect(url_for("show_studies_entry", studies_entry_id=studies_entry_id))
+        return redirect(url_for(
+            "show_studies_entry",
+            studies_entry_id=studies_entry_id
+        ))
 
     return render_template(
         "make-studies-entry.html",
         is_edit=True,
         studies_entry_id=studies_entry_id,
         form=form,
-        logged_in = current_user.is_authenticated
+        logged_in=current_user.is_authenticated
     )
+
 
 @app.route("/delete/studies/<int:studies_entry_id>")
 @admin_only
 @login_required
 def delete_studies_entry(studies_entry_id):
+    '''Delete a studies entry by its ID.'''
     studies_entry_to_delete = db.get_or_404(Studies, studies_entry_id)
     db.session.delete(studies_entry_to_delete)
     db.session.commit()
     return redirect(url_for('studies'))
 
-#----------------------------------------------------------------------------------------------------------------------#
+# ---------------------------------------------------------- #
 
-#--------------------------------PROJECTS------------------------------------------------------------------------------#
+# ----------------------PROJECTS---------------------------- #
+
 
 @app.route("/projects")
 def projects():
+    '''Get all projects entries.'''
     result = db.session.execute(db.select(Projects))
     projects_entries = result.scalars().all()
     return render_template(
@@ -437,9 +513,10 @@ def projects():
         logged_in=current_user.is_authenticated
     )
 
+
 @app.route("/projects/<int:projects_entry_id>", methods=["GET", "POST"])
 def show_projects_entry(projects_entry_id):
-
+    '''Get a project entry by its ID.'''
     selected_projects_entry = db.get_or_404(Projects, projects_entry_id)
 
     form = StepForm()
@@ -447,28 +524,35 @@ def show_projects_entry(projects_entry_id):
     if form.validate_on_submit():
 
         new_step = ProjectStep(
-            name = form.name.data,
-            completed = False,
-            project = selected_projects_entry,
+            name=form.name.data,
+            completed=False,
+            project=selected_projects_entry,
         )
 
         db.session.add(new_step)
         db.session.commit()
 
-        return redirect(url_for('update_progress_and_update_step', step_id=new_step.id))
-
+        return redirect(url_for(
+            'update_progress_and_update_step',
+            step_id=new_step.id
+        ))
 
     return render_template(
         "projects_entry.html",
         form=form,
         projects_entry=selected_projects_entry,
-        logged_in = current_user.is_authenticated
+        logged_in=current_user.is_authenticated
     )
 
-@app.route("/update-progress/project/<int:project_id>", methods=["GET", "POST"])
+
+@app.route(
+    "/update-progress/project/<int:project_id>",
+    methods=["GET", "POST"]
+)
 @admin_only
 @login_required
 def update_progress(project_id):
+    '''Update a project progress entry by its ID.'''
     selected_projects_entry = db.get_or_404(Projects, project_id)
 
     # Update the progress_level value
@@ -481,21 +565,33 @@ def update_progress(project_id):
             if s.completed:
                 completed_count += 1
 
-        selected_projects_entry.progress_level = (completed_count / total_steps) * 100
+        selected_projects_entry.progress_level = (
+                (completed_count / total_steps) * 100
+        )
     else:
         selected_projects_entry.progress_level = 0
 
-    selected_projects_entry.progress_level = round(selected_projects_entry.progress_level, 2)
+    selected_projects_entry.progress_level = round(
+        selected_projects_entry.progress_level,
+        2
+    )
 
     db.session.commit()
 
-    return redirect(url_for("show_projects_entry", projects_entry_id=project_id))
+    return redirect(url_for(
+        "show_projects_entry",
+        projects_entry_id=project_id)
+    )
 
-@app.route("/update-progress/step/<int:step_id>", methods=["GET", "POST"])
+
+@app.route(
+    "/update-progress/step/<int:step_id>",
+    methods=["GET", "POST"]
+)
 @admin_only
 @login_required
 def update_progress_and_update_step(step_id):
-
+    '''Update a step progress entry by its ID.'''
     # Get the project entry by ID
     selected_step = db.get_or_404(ProjectStep, step_id)
 
@@ -521,31 +617,42 @@ def update_progress_and_update_step(step_id):
             if s.completed:
                 completed_count += 1
 
-        selected_projects_entry.progress_level = (completed_count / total_steps) * 100
+        selected_projects_entry.progress_level = (
+                (completed_count / total_steps) * 100
+        )
     else:
         selected_projects_entry.progress_level = 0
 
-    selected_projects_entry.progress_level = round(selected_projects_entry.progress_level, 2)
+    selected_projects_entry.progress_level = (
+        round(selected_projects_entry.progress_level, 2)
+    )
 
     db.session.commit()
 
-    return redirect(url_for("show_projects_entry", projects_entry_id=selected_step.project_id))
+    return redirect(url_for(
+        "show_projects_entry",
+        projects_entry_id=selected_step.project_id)
+    )
+
 
 @app.route("/new-projects-entry", methods=["GET", "POST"])
 @admin_only
 @login_required
 def add_new_projects_entry():
+
+    """Add a new project entry to the database."""
+
     form = ProjectsEntryForm()
 
     if form.validate_on_submit():
 
         new_projects_entry = Projects(
-            name = form.name.data,
-            progress_level = 100,
-            start_date = form.start_date.data,
-            end_date = form.end_date.data,
-            body = form.body.data,
-            img_url = form.img_url.data,
+            name=form.name.data,
+            progress_level=100,
+            start_date=form.start_date.data,
+            end_date=form.end_date.data,
+            body=form.body.data,
+            img_url=form.img_url.data,
         )
 
         db.session.add(new_projects_entry)
@@ -556,21 +663,26 @@ def add_new_projects_entry():
     return render_template(
         "make-projects-entry.html",
         form=form,
-        logged_in = current_user.is_authenticated
+        logged_in=current_user.is_authenticated
     )
 
-@app.route("/edit-projects-entry/<int:projects_entry_id>", methods=["GET", "POST"])
+
+@app.route(
+    "/edit-projects-entry/<int:projects_entry_id>",
+    methods=["GET", "POST"]
+)
 @admin_only
 @login_required
 def edit_projects_entry(projects_entry_id):
+    '''Edit a project entry by its ID.'''
     selected_projects_entry = db.get_or_404(Projects, projects_entry_id)
 
     form = ProjectsEntryForm(
-        name = selected_projects_entry.name,
-        start_date = selected_projects_entry.start_date,
-        end_date = selected_projects_entry.end_date,
-        body = selected_projects_entry.body,
-        img_url = selected_projects_entry.img_url,
+        name=selected_projects_entry.name,
+        start_date=selected_projects_entry.start_date,
+        end_date=selected_projects_entry.end_date,
+        body=selected_projects_entry.body,
+        img_url=selected_projects_entry.img_url,
     )
 
     if form.validate_on_submit():
@@ -582,21 +694,25 @@ def edit_projects_entry(projects_entry_id):
         selected_projects_entry.img_url = form.img_url.data
         db.session.commit()
 
-        return redirect(url_for("show_projects_entry", projects_entry_id=projects_entry_id))
+        return redirect(url_for(
+            "show_projects_entry",
+            projects_entry_id=projects_entry_id)
+        )
 
     return render_template(
         "make-projects-entry.html",
         is_edit=True,
         projects_entry_id=projects_entry_id,
         form=form,
-        logged_in = current_user.is_authenticated
+        logged_in=current_user.is_authenticated
     )
+
 
 @app.route("/delete/steps/<int:step_id>")
 @admin_only
 @login_required
 def delete_step(step_id):
-
+    '''Delete a step entry by its ID.'''
     selected_step = db.get_or_404(ProjectStep, step_id)
 
     project_id = selected_step.project_id
@@ -607,11 +723,11 @@ def delete_step(step_id):
     return redirect(url_for("update_progress", project_id=project_id))
 
 
-
 @app.route("/delete/projects/<int:projects_entry_id>")
 @admin_only
 @login_required
 def delete_projects_entry(projects_entry_id):
+    '''Delete a project entry by its ID.'''
     projects_entry_to_delete = db.get_or_404(Projects, projects_entry_id)
 
     for step in projects_entry_to_delete.steps:
@@ -622,25 +738,34 @@ def delete_projects_entry(projects_entry_id):
     db.session.commit()
     return redirect(url_for('projects'))
 
+# ----------------------------------------------------------------- #
 
+# -----------------------RECOMMENDATIONS--------------------------- #
 
-#----------------------------------------------------------------------------------------------------------------------#
+# ----------------------------------------------------------------- #
 
-#--------------------------------RECOMMENDATIONS-----------------------------------------------------------------------#
+# -----------------ABOUT & CONTACT ROUTES-------------------------- #
 
-#----------------------------------------------------------------------------------------------------------------------#
-
-#--------------------------------ABOUT & CONTACT ROUTES----------------------------------------------------------------#
 
 @app.route("/about")
 def about():
-    return render_template("about.html", logged_in = current_user.is_authenticated)
+    '''About page'''
+    return render_template(
+        "about.html",
+        logged_in=current_user.is_authenticated
+    )
+
 
 @app.route("/contact")
 def contact():
-    return render_template("contact.html", logged_in = current_user.is_authenticated)
+    '''Contact page'''
+    return render_template(
+        "contact.html",
+        logged_in=current_user.is_authenticated
+    )
 
-#----------------------------------------------------------------------------------------------------------------------#
+# ---------------------------------------------------------------- #
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', debug=False, port=5000)
