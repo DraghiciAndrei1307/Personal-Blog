@@ -11,7 +11,6 @@ jobs:
     environment: Personal-Blog-Environment
     env:
       FLASK_KEY: ${{ secrets.FLASK_KEY }}
-      DB_URI: postgresql+psycopg2://test:test@postgres:5432/test_db
     steps:
       - name: Get Code
         uses: actions/checkout@v6
