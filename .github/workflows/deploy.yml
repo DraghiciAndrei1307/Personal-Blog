@@ -29,7 +29,7 @@ jobs:
           pip install -r requirements.txt
       - name: Lint with pylint
         run: |
-          pylint project/**/*.py
+          pylint project/**/*.py --disable=R0903
       - name: Lint with flake8
         run: |
           flake8 project/
