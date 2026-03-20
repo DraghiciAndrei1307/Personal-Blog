@@ -90,7 +90,7 @@ The `0.0.0.0` is the default route. This means that no particular address has be
 7) In the end, run the application like this:
 
 ```python
-python3 main.py
+python3 -m project.main
 ```
 
 Now, if you go into the browser and type the ip address of your VM: `192.168.1.x:5000` you should see your web app up and 
