@@ -31,9 +31,8 @@ jobs:
         run: |
           pytest -v tests/unit/
           pytest -v tests/functional
-      - name: Run the app
+      - name: Run the app and perform health check
         run: |
           nohup python3 main.py & sleep 5
-      - name: Perform health check (the app is up and running; the process did not crash)
-        run: |
           curl -f http://127.0.0.1:5000/
+          
