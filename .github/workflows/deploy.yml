@@ -7,15 +7,6 @@ on:
       - test
 jobs:
   test:
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_USER: test
-          POSTGRES_PASSWORD: test
-          POSTGRES_DB: test_db
-        ports:
-          - 5432:5432
     runs-on: ubuntu-latest
     environment: Personal-Blog-Environment
     env:
@@ -31,17 +22,11 @@ jobs:
       - name: Install depencencies
         run: |
           pip install -r requirements.txt
-      - name: Install Postgres client
-        run: sudo apt-get update && sudo apt-get install -y postgresql-client
-      - name: Wait for Postgres
+
+      - name: Run tests with pytest
         run: |
-          until pg_isready -h localhost -p 5432 -U test; do
-            echo "Waiting for Postgres..."
-            sleep 1
-          done
-      - name: Connect to PostgreSQL
-        run: |
-          psql -h postgres -h postgres -d test_db -U test -p 5432 -c "SELECT 1;"
+          pytest -v tests/unit/
+          pytest -v tests/functional
       - name: Run the app
         run: |
           nohup python3 main.py & sleep 5
