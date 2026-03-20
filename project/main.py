@@ -5,7 +5,7 @@ from flask_ckeditor import CKEditor
 #from flask_gravatar import Gravatar
 from flask_login import login_user, LoginManager, current_user, logout_user, login_required
 
-from models import User, BlogPost, Comment, Projects, ProjectStep, db, Career, Studies
+from project.models import User, BlogPost, Comment, Projects, ProjectStep, db, Career, Studies
 
 from functools import wraps
 
@@ -13,7 +13,7 @@ from http import HTTPStatus
 #from sqlalchemy.testing.pickleable import User
 from werkzeug.security import generate_password_hash, check_password_hash
 # Import your forms from the forms.py
-from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm, CareerEntryForm, StudiesEntryForm, \
+from project.forms import CreatePostForm, RegisterForm, LoginForm, CommentForm, CareerEntryForm, StudiesEntryForm, \
     ProjectsEntryForm, StepForm
 
 from typing import List
