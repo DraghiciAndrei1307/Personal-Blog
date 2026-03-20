@@ -31,6 +31,11 @@ jobs:
       - name: Install depencencies
         run: |
           pip install -r requirements.txt
+
+      - name: Run tests with pytest
+        run: |
+          pytest -v tests/unit/
+          pytest -v tests/functional
       - name: Install Postgres client
         run: sudo apt-get update && sudo apt-get install -y postgresql-client
       - name: Wait for Postgres
