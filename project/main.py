@@ -1,38 +1,24 @@
+
+"""Main module."""
+
+import os
+from functools import wraps
+from http import HTTPStatus
+
 from datetime import date
+
 from flask import Flask, abort, render_template, redirect, url_for, flash, request
 from flask_bootstrap import Bootstrap
 from flask_ckeditor import CKEditor
-#from flask_gravatar import Gravatar
 from flask_login import login_user, LoginManager, current_user, logout_user, login_required
+from werkzeug.security import generate_password_hash, check_password_hash
 
 from project.models import User, BlogPost, Comment, Projects, ProjectStep, db, Career, Studies
 
-from functools import wraps
-
-from http import HTTPStatus
-#from sqlalchemy.testing.pickleable import User
-from werkzeug.security import generate_password_hash, check_password_hash
 # Import your forms from the forms.py
-from project.forms import CreatePostForm, RegisterForm, LoginForm, CommentForm, CareerEntryForm, StudiesEntryForm, \
-    ProjectsEntryForm, StepForm
-
-from typing import List
-from sqlalchemy import ForeignKey
-
-import os
-
-'''
-Make sure the required packages are installed: 
-Open the Terminal in PyCharm (bottom left). 
-
-On Windows type:
-python -m pip install -r requirements.txt
-
-On MacOS type:
-pip3 install -r requirements.txt
-
-This will install the packages from the requirements.txt for this project.
-'''
+from project.forms import CreatePostForm, RegisterForm, LoginForm, \
+                          CommentForm, CareerEntryForm, StudiesEntryForm, \
+                          ProjectsEntryForm, StepForm
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('FLASK_KEY')
@@ -56,17 +42,26 @@ with app.app_context():
 
 @login_manager.user_loader
 def load_user(user_id):
+
+    """Special function that retrieves a user by id."""
+
     return db.session.execute(db.select(User).where(User.id == user_id)).scalar()
 
 # Use Werkzeug to hash the user's password when creating a new user.
 @app.route('/register', methods=["GET", "POST"])
 def register():
 
+    """Register a new user."""
+
     form = RegisterForm()
 
     if form.validate_on_submit():
 
-        salted_password = generate_password_hash(form.password.data, method='pbkdf2:sha256', salt_length=8)
+        salted_password = generate_password_hash(
+            form.password.data,
+            method='pbkdf2:sha256',
+            salt_length=8
+        )
 
         # check if the email exists inside the database User table
 
@@ -92,43 +87,57 @@ def register():
 @app.route('/login', methods=["GET", "POST"])
 def login():
 
+    """Login a user."""
+
     form = LoginForm()
 
     if form.validate_on_submit():
 
-        selected_user = db.session.execute(db.select(User).where(User.email == form.email.data)).scalar()
+        selected_user = db.session.execute(
+            db.select(User).where(User.email == form.email.data)
+        ).scalar()
 
         if not selected_user:
             flash('Email is incorrect.')
             return redirect(url_for("login"))
 
-        elif not check_password_hash(selected_user.password, form.password.data):
+        if not check_password_hash(selected_user.password, form.password.data):
             flash('Invalid password.')
             return redirect(url_for("login"))
 
-        else:
-            login_user(selected_user)
-            return redirect(url_for("get_all_posts"))
+        login_user(selected_user)
+        return redirect(url_for("get_all_posts"))
 
     return render_template("login.html", form = form)
 
 @app.route('/logout')
 @login_required
 def logout():
+
+    """Logout a user."""
+
     logout_user()
     return redirect(url_for('get_all_posts'))
 
-#--------------------------------BLOG POSTS----------------------------------------------------------------------------#
+#--------------------BLOG POSTS-----------------------#
 
 @app.route('/')
 def get_all_posts():
+
+    """Get all posts."""
+
     result = db.session.execute(db.select(BlogPost))
     posts = result.scalars().all()
-    return render_template("index.html", all_posts=posts, logged_in = current_user.is_authenticated)
+    return render_template(
+        "index.html",
+        all_posts=posts,
+        logged_in = current_user.is_authenticated
+    )
 
 # Allow logged-in users to comment on posts
 @app.route("/post/<int:post_id>", methods=["GET", "POST"])
 def show_post(post_id):
+    """Show a post."""
     requested_post = db.get_or_404(BlogPost, post_id)
 
     result = db.session.execute(db.select(Comment))
@@ -149,7 +158,12 @@ def show_post(post_id):
         db.session.add(new_comment)
         db.session.commit()
 
-        return redirect(url_for("show_post", post_id=post_id, comments=comments, logged_in = current_user.is_authenticated))
+        return redirect(url_for(
+            "show_post",
+            post_id=post_id,
+            comments=comments,
+            logged_in = current_user.is_authenticated
+        ))
 
     return render_template(
         "post.html",
@@ -160,6 +174,7 @@ def show_post(post_id):
     )
 
 def admin_only(f):
+    """Decorator for admin only functions."""
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if current_user.get_id() != '1':
@@ -173,6 +188,7 @@ def admin_only(f):
 @admin_only
 @login_required
 def add_new_post():
+    '''Add a new post.'''
     form = CreatePostForm()
     if form.validate_on_submit():
         new_post = BlogPost(
@@ -186,12 +202,17 @@ def add_new_post():
         db.session.add(new_post)
         db.session.commit()
         return redirect(url_for("get_all_posts"))
-    return render_template("make-post.html", form=form, logged_in = current_user.is_authenticated)
+    return render_template(
+        "make-post.html",
+        form=form,
+        logged_in = current_user.is_authenticated
+    )
 
 @app.route("/edit-post/<int:post_id>", methods=["GET", "POST"])
 @admin_only
 @login_required
 def edit_post(post_id):
+    '''Edit a post.'''
     post = db.get_or_404(BlogPost, post_id)
 
     edit_form = CreatePostForm(
@@ -223,17 +244,19 @@ def edit_post(post_id):
 @admin_only
 @login_required
 def delete_post(post_id):
+    '''Delete a post.'''
     post_to_delete = db.get_or_404(BlogPost, post_id)
     db.session.delete(post_to_delete)
     db.session.commit()
     return redirect(url_for('get_all_posts'))
 
-#----------------------------------------------------------------------------------------------------------------------#
+#--------------------------------------#
 
-#--------------------------------CAREER--------------------------------------------------------------------------------#
+#----------------CAREER-------------------------#
 
 @app.route("/career")
 def career():
+    '''Get career entries.'''
     result = db.session.execute(db.select(Career))
     career_entries = result.scalars().all()
     return render_template(
@@ -244,7 +267,7 @@ def career():
 
 @app.route("/career/<int:career_entry_id>")
 def show_career_entry(career_entry_id):
-
+    '''Show a career entry.'''
     selected_career_entry = db.get_or_404(Career, career_entry_id)
 
     return render_template(
@@ -256,7 +279,7 @@ def show_career_entry(career_entry_id):
 @admin_only
 @login_required
 def add_new_career_entry():
-
+    '''Add a new career entry.'''
     form = CareerEntryForm()
 
     if form.validate_on_submit():
@@ -287,7 +310,7 @@ def add_new_career_entry():
 @admin_only
 @login_required
 def edit_career_entry(career_entry_id):
-
+    '''Edit a career entry.'''
     selected_career_entry = db.get_or_404(Career, career_entry_id)
 
     form = CareerEntryForm(
@@ -308,7 +331,10 @@ def edit_career_entry(career_entry_id):
         selected_career_entry.activity = form.activity.data
         db.session.commit()
 
-        return redirect(url_for("show_career_entry", career_entry_id=career_entry_id))
+        return redirect(url_for(
+            "show_career_entry",
+            career_entry_id=career_entry_id
+        ))
 
     return render_template(
         "make-career-entry.html",
@@ -322,17 +348,19 @@ def edit_career_entry(career_entry_id):
 @admin_only
 @login_required
 def delete_career_entry(career_entry_id):
+    '''Delete a career entry.'''
     career_entry_to_delete = db.get_or_404(Career, career_entry_id)
     db.session.delete(career_entry_to_delete)
     db.session.commit()
     return redirect(url_for('career'))
 
-#----------------------------------------------------------------------------------------------------------------------#
+#------------------------------------------#
 
-#--------------------------------STUDIES-------------------------------------------------------------------------------#
+#-----------------------STUDIES-------------------------------#
 
 @app.route("/studies")
 def studies():
+    '''Show a list of studies entries.'''
     result = db.session.execute(db.select(Studies))
     studies_entries = result.scalars().all()
     return render_template(
@@ -343,7 +371,7 @@ def studies():
 
 @app.route("/studies/<int:studies_entry_id>")
 def show_studies_entry(studies_entry_id):
-
+    '''Get a studies entry by its ID.'''
     selected_studies_entry = db.get_or_404(Studies, studies_entry_id)
 
     return render_template(
@@ -355,6 +383,7 @@ def show_studies_entry(studies_entry_id):
 @admin_only
 @login_required
 def add_new_studies_entry():
+    '''Add a new studies entry.'''
     form = StudiesEntryForm()
 
     if form.validate_on_submit():
@@ -383,6 +412,7 @@ def add_new_studies_entry():
 @admin_only
 @login_required
 def edit_studies_entry(studies_entry_id):
+    '''Edit a studies entry by its ID.'''
     selected_studies_entry = db.get_or_404(Studies, studies_entry_id)
 
     form = StudiesEntryForm(
@@ -404,7 +434,10 @@ def edit_studies_entry(studies_entry_id):
         selected_studies_entry.img_url = form.img_url.data
         db.session.commit()
 
-        return redirect(url_for("show_studies_entry", studies_entry_id=studies_entry_id))
+        return redirect(url_for(
+            "show_studies_entry",
+            studies_entry_id=studies_entry_id
+        ))
 
     return render_template(
         "make-studies-entry.html",
@@ -418,17 +451,19 @@ def edit_studies_entry(studies_entry_id):
 @admin_only
 @login_required
 def delete_studies_entry(studies_entry_id):
+    '''Delete a studies entry by its ID.'''
     studies_entry_to_delete = db.get_or_404(Studies, studies_entry_id)
     db.session.delete(studies_entry_to_delete)
     db.session.commit()
     return redirect(url_for('studies'))
 
-#----------------------------------------------------------------------------------------------------------------------#
+#----------------------------------------------------------#
 
-#--------------------------------PROJECTS------------------------------------------------------------------------------#
+#----------------------PROJECTS----------------------------#
 
 @app.route("/projects")
 def projects():
+    '''Get all projects entries.'''
     result = db.session.execute(db.select(Projects))
     projects_entries = result.scalars().all()
     return render_template(
@@ -439,7 +474,7 @@ def projects():
 
 @app.route("/projects/<int:projects_entry_id>", methods=["GET", "POST"])
 def show_projects_entry(projects_entry_id):
-
+    '''Get a project entry by its ID.'''
     selected_projects_entry = db.get_or_404(Projects, projects_entry_id)
 
     form = StepForm()
@@ -455,7 +490,10 @@ def show_projects_entry(projects_entry_id):
         db.session.add(new_step)
         db.session.commit()
 
-        return redirect(url_for('update_progress_and_update_step', step_id=new_step.id))
+        return redirect(url_for(
+            'update_progress_and_update_step',
+            step_id=new_step.id
+        ))
 
 
     return render_template(
@@ -469,6 +507,7 @@ def show_projects_entry(projects_entry_id):
 @admin_only
 @login_required
 def update_progress(project_id):
+    '''Update a project progress entry by its ID.'''
     selected_projects_entry = db.get_or_404(Projects, project_id)
 
     # Update the progress_level value
@@ -495,7 +534,7 @@ def update_progress(project_id):
 @admin_only
 @login_required
 def update_progress_and_update_step(step_id):
-
+    '''Update a step progress entry by its ID.'''
     # Get the project entry by ID
     selected_step = db.get_or_404(ProjectStep, step_id)
 
@@ -535,6 +574,7 @@ def update_progress_and_update_step(step_id):
 @admin_only
 @login_required
 def add_new_projects_entry():
+    '''Add a new project entry to the database.'''
     form = ProjectsEntryForm()
 
     if form.validate_on_submit():
@@ -563,6 +603,7 @@ def add_new_projects_entry():
 @admin_only
 @login_required
 def edit_projects_entry(projects_entry_id):
+    '''Edit a project entry by its ID.'''
     selected_projects_entry = db.get_or_404(Projects, projects_entry_id)
 
     form = ProjectsEntryForm(
@@ -596,7 +637,7 @@ def edit_projects_entry(projects_entry_id):
 @admin_only
 @login_required
 def delete_step(step_id):
-
+    '''Delete a step entry by its ID.'''
     selected_step = db.get_or_404(ProjectStep, step_id)
 
     project_id = selected_step.project_id
@@ -612,6 +653,7 @@ def delete_step(step_id):
 @admin_only
 @login_required
 def delete_projects_entry(projects_entry_id):
+    '''Delete a project entry by its ID.'''
     projects_entry_to_delete = db.get_or_404(Projects, projects_entry_id)
 
     for step in projects_entry_to_delete.steps:
@@ -624,23 +666,31 @@ def delete_projects_entry(projects_entry_id):
 
 
 
-#----------------------------------------------------------------------------------------------------------------------#
+#-----------------------------------------------------------------#
 
-#--------------------------------RECOMMENDATIONS-----------------------------------------------------------------------#
+#------------------------RECOMMENDATIONS--------------------------#
 
-#----------------------------------------------------------------------------------------------------------------------#
+#-----------------------------------------------------------------#
 
-#--------------------------------ABOUT & CONTACT ROUTES----------------------------------------------------------------#
+#-----------------ABOUT & CONTACT ROUTES--------------------------#
 
 @app.route("/about")
 def about():
-    return render_template("about.html", logged_in = current_user.is_authenticated)
+    '''About page'''
+    return render_template(
+        "about.html",
+        logged_in = current_user.is_authenticated
+    )
 
 @app.route("/contact")
 def contact():
-    return render_template("contact.html", logged_in = current_user.is_authenticated)
+    '''Contact page'''
+    return render_template(
+        "contact.html",
+        logged_in = current_user.is_authenticated
+    )
 
-#----------------------------------------------------------------------------------------------------------------------#
+#----------------------------------------------------------------#
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', debug=False, port=5000)

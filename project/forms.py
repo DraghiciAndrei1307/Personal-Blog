@@ -1,11 +1,17 @@
+
+"""A collection of Flask forms used throughout the project"""
+
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, PasswordField, FloatField, BooleanField
-from wtforms.validators import DataRequired, URL, Email
+from wtforms import StringField, SubmitField, PasswordField
+from wtforms.validators import DataRequired, URL
 from flask_ckeditor import CKEditorField
 
 
 # WTForm for creating a blog post
 class CreatePostForm(FlaskForm):
+
+    """Create Post Form"""
+
     title = StringField("Blog Post Title", validators=[DataRequired()])
     subtitle = StringField("Subtitle", validators=[DataRequired()])
     img_url = StringField("Blog Image URL", validators=[DataRequired(), URL()])
@@ -16,6 +22,9 @@ class CreatePostForm(FlaskForm):
 # RegisterForm to register new users
 
 class RegisterForm(FlaskForm):
+
+    """Register Form"""
+
     email = StringField("Email", validators=[DataRequired()])
     password = PasswordField("Password", validators=[DataRequired()])
     name = StringField("Name", validators=[DataRequired()])
@@ -24,6 +33,9 @@ class RegisterForm(FlaskForm):
 # LoginForm to login existing users
 
 class LoginForm(FlaskForm):
+
+    """Login Form"""
+
     email = StringField("Email", validators=[DataRequired()])
     password = PasswordField("Password", validators=[DataRequired()])
     submit = SubmitField("Submit")
@@ -31,12 +43,18 @@ class LoginForm(FlaskForm):
 
 # CommentForm so users can leave comments below posts
 class CommentForm(FlaskForm):
+
+    """Comment Form"""
+
     body = CKEditorField("Comment", validators=[DataRequired()])
     submit = SubmitField("Add Comment")
 
 # CareerEntryForm so users can add their studies
 
 class CareerEntryForm(FlaskForm):
+
+    """Career Entry Form"""
+
     organization_name = StringField("Organization Name", validators=[DataRequired()])
     role = StringField("Domain Name", validators=[DataRequired()])
     start_date = StringField("Start Date", validators=[DataRequired()])
@@ -48,6 +66,9 @@ class CareerEntryForm(FlaskForm):
 # StudiesEntryForm so users can add their studies
 
 class StudiesEntryForm(FlaskForm):
+
+    """Studies Entry Form"""
+
     university = StringField("Organization Name", validators=[DataRequired()])
     faculty = StringField("Domain Name", validators=[DataRequired()])
     start_date = StringField("Start Date", validators=[DataRequired()])
@@ -57,6 +78,9 @@ class StudiesEntryForm(FlaskForm):
     submit = SubmitField("Submit")
 
 class ProjectsEntryForm(FlaskForm):
+
+    """Projects Entry Form"""
+
     name = StringField("Project Name", validators=[DataRequired()])
     start_date = StringField("Start Date", validators=[DataRequired()])
     end_date = StringField("End Date", validators=[DataRequired()])
@@ -65,7 +89,8 @@ class ProjectsEntryForm(FlaskForm):
     submit = SubmitField("Submit")
 
 class StepForm(FlaskForm):
+
+    """Step Form"""
+
     name = StringField("Step Name", validators=[DataRequired()])
     submit = SubmitField("Add Step")
-
-
