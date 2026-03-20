@@ -3,17 +3,17 @@ from flask import Flask, abort, render_template, redirect, url_for, flash, reque
 from flask_bootstrap import Bootstrap
 from flask_ckeditor import CKEditor
 #from flask_gravatar import Gravatar
-from flask_login import UserMixin, login_user, LoginManager, current_user, logout_user, login_required
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import relationship, DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import Integer, String, Text, Float, Boolean
+from flask_login import login_user, LoginManager, current_user, logout_user, login_required
+
+from project.models import User, BlogPost, Comment, Projects, ProjectStep, db, Career, Studies
+
 from functools import wraps
 
 from http import HTTPStatus
 #from sqlalchemy.testing.pickleable import User
 from werkzeug.security import generate_password_hash, check_password_hash
 # Import your forms from the forms.py
-from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm, CareerEntryForm, StudiesEntryForm, \
+from project.forms import CreatePostForm, RegisterForm, LoginForm, CommentForm, CareerEntryForm, StudiesEntryForm, \
     ProjectsEntryForm, StepForm
 
 from typing import List
@@ -45,110 +45,9 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 # CREATE DATABASE
-class Base(DeclarativeBase):
-    pass
 
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DB_URI", "sqlite:///posts.db")
-
-db = SQLAlchemy(model_class=Base)
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DB_URI", "sqlite:///posts.db")
 db.init_app(app)
-
-# CONFIGURE TABLES
-
-# User model to create a table for all registered users.
-
-class User(UserMixin, db.Model): # UserMixin contains some special attributes and methods required for the log in
-    __tablename__ = "user_table"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    email: Mapped[str] = mapped_column(String(100), unique=True)
-    password: Mapped[str] = mapped_column(String(100))
-    name: Mapped[str] = mapped_column(String(1000))
-
-    posts = relationship("BlogPost", back_populates="author")
-    comments = relationship("Comment", back_populates="author")
-
-# BlogPost model to create a table for all blog posts created by the admin users
-
-class BlogPost(db.Model):
-    __tablename__ = "blog_posts_table"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    title: Mapped[str] = mapped_column(String(250), unique=True, nullable=False)
-    subtitle: Mapped[str] = mapped_column(String(250), nullable=False)
-    date: Mapped[str] = mapped_column(String(250), nullable=False)
-    body: Mapped[str] = mapped_column(Text, nullable=False)
-    img_url: Mapped[str] = mapped_column(String(250), nullable=False)
-
-    author_id: Mapped[int] = mapped_column(Integer, db.ForeignKey("user_table.id"))
-    author = relationship("User", back_populates="posts")
-
-    comments = relationship("Comment", back_populates="post")
-
-# Comment model to create a table for all comments created by registered users
-
-class Comment(db.Model):
-
-    __tablename__ = "comment_table"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    text: Mapped[str] = mapped_column(String(250), nullable=False)
-
-    post_id: Mapped[int] = mapped_column(Integer, db.ForeignKey("blog_posts_table.id"))
-    post = relationship("BlogPost", back_populates="comments")
-
-    author_id: Mapped[int] = mapped_column(Integer, db.ForeignKey("user_table.id"))
-    author = relationship("User", back_populates="comments")
-
-
-class Career(db.Model):
-
-    __tablename__ = "career_table"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    organization_name: Mapped[str] = mapped_column(String(250), nullable=False)
-    role: Mapped[str] = mapped_column(String(250), nullable=False)
-    start_date: Mapped[str] = mapped_column(String(250), nullable=False)
-    end_date: Mapped[str] = mapped_column(String(250), nullable=False)
-    activity: Mapped[str] = mapped_column(Text, nullable=False)
-    img_url: Mapped[str] = mapped_column(String(250), nullable=False)
-
-class Studies(db.Model):
-
-    __tablename__ = "studies_table"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    university: Mapped[str] = mapped_column(String(250), nullable=False)
-    faculty: Mapped[str] = mapped_column(String(250), nullable=False)
-    start_date: Mapped[str] = mapped_column(String(250), nullable=False)
-    end_date: Mapped[str] = mapped_column(String(250), nullable=False)
-    grade: Mapped[str] = mapped_column(String(250), nullable=False)
-    img_url: Mapped[str] = mapped_column(String(250), nullable=False)
-
-class Projects(db.Model):
-
-    __tablename__ = "projects_table"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    name: Mapped[str] = mapped_column(String(250), nullable=False)
-    progress_level: Mapped[str] = mapped_column(Float, nullable=False)
-    start_date: Mapped[str] = mapped_column(String(250), nullable=False)
-    end_date: Mapped[str] = mapped_column(String(250), nullable=False)
-    body: Mapped[str] = mapped_column(Text, nullable=False)
-    img_url: Mapped[str] = mapped_column(String(250), nullable=False)
-
-    steps = relationship("ProjectStep", back_populates="project")
-
-class ProjectStep(db.Model):
-
-    __tablename__ = "project_steps_table"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    name: Mapped[str] = mapped_column(String(250), nullable=False)
-    completed: Mapped[bool] = mapped_column(Boolean, nullable=False)
-
-    project_id: Mapped[int] = mapped_column(Integer, db.ForeignKey("projects_table.id"))
-    project = relationship("Projects", back_populates="steps")
 
 with app.app_context():
     db.create_all()
@@ -200,12 +99,13 @@ def login():
         selected_user = db.session.execute(db.select(User).where(User.email == form.email.data)).scalar()
 
         if not selected_user:
-
             flash('Email is incorrect.')
-
             return redirect(url_for("login"))
+
         elif not check_password_hash(selected_user.password, form.password.data):
             flash('Invalid password.')
+            return redirect(url_for("login"))
+
         else:
             login_user(selected_user)
             return redirect(url_for("get_all_posts"))
@@ -739,24 +639,6 @@ def about():
 @app.route("/contact")
 def contact():
     return render_template("contact.html", logged_in = current_user.is_authenticated)
-
-@app.route("/health")
-def health():
-    return "OK", 200
-
-@app.route("/ready")
-def ready():
-    import time
-    for _ in range(5):
-        try:
-            with app.app_context(): # make sure we have the context
-                db.session.execute("SELECT 1")
-            return "OK", 200
-        except Exception as e:
-            print(e)
-            time.sleep(2)
-
-    return "Not Ready", 500
 
 #----------------------------------------------------------------------------------------------------------------------#
 
