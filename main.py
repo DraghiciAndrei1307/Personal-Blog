@@ -48,7 +48,8 @@ login_manager.init_app(app)
 class Base(DeclarativeBase):
     pass
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DB_URI", "sqlite:///posts.db")
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DB_URI", "sqlite:///posts.db")
+
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
 
@@ -738,6 +739,24 @@ def about():
 @app.route("/contact")
 def contact():
     return render_template("contact.html", logged_in = current_user.is_authenticated)
+
+@app.route("/health")
+def health():
+    return "OK", 200
+
+@app.route("/ready")
+def ready():
+    import time
+    for _ in range(5):
+        try:
+            with app.app_context(): # make sure we have the context
+                db.session.execute("SELECT 1")
+            return "OK", 200
+        except Exception as e:
+            print(e)
+            time.sleep(2)
+
+    return "Not Ready", 500
 
 #----------------------------------------------------------------------------------------------------------------------#
 
