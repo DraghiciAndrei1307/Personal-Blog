@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Copy dependency file
-COPY project/requirements.txt requirements.txt
+COPY requirements.txt requirements.txt
 
 # Create a virtual environment and install dependencies
 RUN python3 -m venv venv && \
