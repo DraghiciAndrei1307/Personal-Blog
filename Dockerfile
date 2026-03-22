@@ -1,8 +1,6 @@
 FROM ubuntu:latest
 LABEL authors="Andrei Draghici"
 
-FROM ubuntu:24.04
-
 ARG APP_VERSION="1.0"
 ARG APP_NAME="personal-website-1"
 
