@@ -8,13 +8,15 @@ https://andrei-draghici-personal-website.onrender.com/
 
 ## 🧭 How to use
 
-There are 2 ways of using this web application app: 
+There are 3 ways of using this web application app: 
     
-    - host is on a private VM on your local network
+    - host is on a private VM/container on your local network
     - use a dedicated VPS and deploy this application on the Internet (this is the option I currently use)
 
 
-### 🚀 Host on a private VM on your local home network
+### 🚀 Host on a private VM/container on your local home network
+
+#### Host on a private VM
 
 If I want to test one of my Flask web application, I usually do the following steps on a dedicated virtual machine:
 
@@ -95,6 +97,55 @@ python3 -m project.main
 
 Now, if you go into the browser and type the ip address of your VM: `192.168.1.x:5000` you should see your web app up and 
 running inside your local network. 
+
+#### Host on a custom Docker container
+
+In order to run this application on a custom container, the following were created:
+- Dockerfile
+- my_docker_build_and_run.sh
+- my_docker_clean.sh
+- my_docker_terminal.sh
+
+The Dockerfile is a configuration file which we will use to build a Docker image. In this file we can configure:
+- the working directory
+- different environment variables
+- what it needs to be installed when creating the container
+- what files to be included inside the container
+- what ports to expose
+- etc.
+
+In order to `build the Docker image`, we can use:
+
+```commandline
+docker build -t personal-website-1:1.0 .
+```
+
+To `run the container`, based on the previously created image, we can use: 
+
+```commandline
+docker run -d \
+  --name personal-website-1-1.0 \
+  -p 5000:5000 \
+  -v /home/student/Personal-Website/output:/app/output \
+  -v  /home/student/Personal-Website/logs:/app/logs \
+  personal-website-1:1.0
+```
+
+You can now check if the container was created by using the following command:
+
+```commandline
+docker ps -a
+```
+
+The 3 operations described above are contained by the `my_docker_build_and_run.sh` bash script. 
+
+In addition to this script, I also created the `my_docker_terminal.sh` and `my_docker_clean.sh` scripts.
+
+The `my_docker_terminal.sh` script lets you access the container terminal and the `my_docker_clean.sh` helps you to 
+stop and remove the container. Also, this cleaning script, is used to remove the image created based on the 
+`Dockerfile`.
+
+
 
 ### 🚀 Host on a dedicated VPS
 
