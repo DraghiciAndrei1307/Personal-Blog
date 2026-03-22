@@ -404,6 +404,8 @@ def studies():
 
 
 @app.route("/studies/<int:studies_entry_id>")
+@admin_only
+@login_required
 def show_studies_entry(studies_entry_id):
     '''Get a studies entry by its ID.'''
     selected_studies_entry = db.get_or_404(Studies, studies_entry_id)

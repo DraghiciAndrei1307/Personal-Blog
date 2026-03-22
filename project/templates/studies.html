@@ -25,10 +25,12 @@
         <!-- Studies Entry preview-->
         {% for studies_entry in studies_entries %}
         <div class="post-preview">
-          <a href="{{ url_for('show_studies_entry', studies_entry_id = studies_entry.id) }}">
+            {% if current_user.get_id() == '1' %}
+              <a href="{{ url_for('show_studies_entry', studies_entry_id = studies_entry.id) }}">
+            {% endif %}
             <h2 class="post-title">{{ studies_entry.university }}</h2>
             <h3 class="post-subtitle">{{ studies_entry.faculty }}</h3>
-          </a>
+          </>
           <p class="post-meta">
             Start: {{studies_entry.start_date}}
             Finish: {{studies_entry.end_date}}
