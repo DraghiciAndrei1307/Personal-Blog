@@ -24,14 +24,14 @@ RUN python3 -m venv venv && \
     venv/bin/pip install -r requirements.txt
 
 # Copy remaining files
-COPY project/ ./
+COPY project/ ./project
 
 # Create the output and logs directories
 RUN mkdir -p /app/output /app/logs
 
 # Set the ENV variables
 
-ENV FLASK_APP=project/main.py
+ENV FLASK_APP=project.main
 ENV FLASK_RUN_HOST=0.0.0.0
 ENV FLASK_RUN_PORT=5000
 
@@ -39,4 +39,5 @@ ENV FLASK_RUN_PORT=5000
 EXPOSE 5000
 
 # Start Flask app
-CMD["bin/bash", "-c", "source venv/bin/activate && flask run --host=0.0.0.0"]
+CMD ["/app/venv/bin/flask", "run", "--host=0.0.0.0", "--port=5000"]
+

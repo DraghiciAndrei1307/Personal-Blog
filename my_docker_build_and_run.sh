@@ -20,4 +20,4 @@ docker run -d \
 
 docker image ls ${APP_NAME}
 
-docker ps --filter "name=${APP_NAME}_${APP_VERSION}"
+docker ps --filter "name=${APP_NAME}-${APP_VERSION}"
