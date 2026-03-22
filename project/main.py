@@ -755,15 +755,6 @@ def about():
         logged_in=current_user.is_authenticated
     )
 
-
-@app.route("/contact")
-def contact():
-    '''Contact page'''
-    return render_template(
-        "contact.html",
-        logged_in=current_user.is_authenticated
-    )
-
 # ---------------------------------------------------------------- #
 
 
