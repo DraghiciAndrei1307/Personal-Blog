@@ -33,8 +33,8 @@
                   <div class="progress-bar" style="width: {{ projects_entry.progress_level }}%">{{ projects_entry.progress_level }}%</div>
           </div>
           <p class="post-meta">
-            Start: {{projects_entry.start_date}}
-            Finish: {{projects_entry.end_date}}
+            from {{projects_entry.start_date}}
+            until {{projects_entry.end_date}}
             {% if current_user.get_id() == '1' %}
               <a href="{{ url_for('delete_projects_entry', projects_entry_id=projects_entry.id) }}">✘</a>
             {% endif %}
