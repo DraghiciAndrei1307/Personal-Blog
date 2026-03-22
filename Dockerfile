@@ -29,5 +29,11 @@ COPY project/ ./
 # Create the output and logs directories
 RUN mkdir -p /app/output /app/logs
 
+# Set the ENV variables
+
+ENV FLASK_APP=project/main.py
+ENV FLASK_RUN_HOST=0.0.0.0
+ENV FLASK_RUN_PORT=5000
+
 # Set the entry point with output redirection
-ENTRYPOINT ["sh", "-c", "venv/bin/python main.py > /app/logs/logfile.trc 2>&1"]
+CMD["flask", "run"]
