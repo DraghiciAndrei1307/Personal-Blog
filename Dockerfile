@@ -34,6 +34,7 @@ RUN mkdir -p /app/output /app/logs
 ENV FLASK_APP=project.main
 ENV FLASK_RUN_HOST=0.0.0.0
 ENV FLASK_RUN_PORT=5000
+ENV FLASK_KEY=my_secret_flask_key
 
 # Expose Port
 EXPOSE 5000
