@@ -2,8 +2,6 @@
 
 APP_VERSION="1.0"
 APP_NAME="personal-website-1"
-HOST_OUTPUT="/home/student/my_docker/personal-website-1/output"
-HOST_LOGS="/home/student/my_docker/personal-website-1/logs"
 CONTAINER_PORT=5000
 HOST_PORT=5000
 
