@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Copy dependency file
-COPY requirements.txt requirements.txt
+COPY requirements.txt ./
 
 # Create a virtual environment and install dependencies
 RUN python3 -m venv venv && \
@@ -35,5 +35,8 @@ ENV FLASK_APP=project/main.py
 ENV FLASK_RUN_HOST=0.0.0.0
 ENV FLASK_RUN_PORT=5000
 
-# Set the entry point with output redirection
-CMD["flask", "run"]
+# Expose Port
+EXPOSE 5000
+
+# Start Flask app
+CMD["bin/bash", "-c", "source venv/bin/activate && flask run --host=0.0.0.0"]
